@@ -51,5 +51,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "PosingEffect.sln"
+    "dotnet.defaultSolution": "sutego_PosingEffect.sln"
 }
