@@ -4,8 +4,13 @@ import numpy as np
 import struct
 import time
 
+#IPアドレス取得
+hostname = socket.gethostname()
+local_ip = socket.gethostbyname(hostname)
+print("local_ipを取得："+str(local_ip))
+
 # サーバーのホストとポートを設定
-HOST = '192.168.1.4'
+HOST = local_ip
 PORT = 50007
 
 # カメラのキャプチャ
