@@ -6,8 +6,9 @@ using UnityEngine.UI;
 
 public class TCPImageReceiver : MonoBehaviour
 {
+    IPManager Ipmanager;
     public RawImage displayImage;
-    public string serverIP = "192.168.1.4";
+    public string serverIP;
     public int serverPort = 50007;
     private TcpClient client;
     private NetworkStream stream;
@@ -15,6 +16,8 @@ public class TCPImageReceiver : MonoBehaviour
 
     void Start()
     {
+        Ipmanager = GetComponent<IPManager>();
+        serverIP = Ipmanager.localIP;
         try
         {
             client = new TcpClient(serverIP, serverPort);
