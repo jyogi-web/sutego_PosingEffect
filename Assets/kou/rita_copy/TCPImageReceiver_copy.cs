@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class TCPImageReceiver_copy : MonoBehaviour
 {
-    IPManager_copy Ipmanager;
+    IPManager_copy Ipmanager_copy;
     public RawImage displayImage;
     public string serverIP;
     public int serverPort = 50007;
@@ -16,16 +16,17 @@ public class TCPImageReceiver_copy : MonoBehaviour
 
     void Start()
     {
-        Ipmanager = GetComponent<IPManager_copy>();
-        serverIP = IPManager_copy.localIP_copy;
+        Ipmanager_copy = GetComponent<IPManager_copy>();
+        serverIP = Ipmanager_copy.localIP;
         try
         {
+            Debug.Log("ImageReceiver:TCPconnect");
             client = new TcpClient(serverIP, serverPort);
             stream = client.GetStream();
         }
         catch (Exception e)
         {
-            Debug.LogError($"TCP�ڑ��̊J�n���ɃG���[���������܂���: {e.Message}");
+            Debug.LogError($"TCPerror: {e.Message}");
         }
     }
 
@@ -35,6 +36,7 @@ public class TCPImageReceiver_copy : MonoBehaviour
         {
             try
             {
+                //Debug.Log("�摜�f�[�^���T�[�o�[�����M��...");
                 // �摜�f�[�^�̒�������M�i4�o�C�g�̒������j
                 byte[] lengthBytes = new byte[4];
                 int totalBytesRead = 0;
