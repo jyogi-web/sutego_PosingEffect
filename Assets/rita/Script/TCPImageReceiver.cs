@@ -20,6 +20,7 @@ public class TCPImageReceiver : MonoBehaviour
         serverIP = Ipmanager.localIP;
         try
         {
+            Debug.Log("ImageReceiver:TCP接続成功");
             client = new TcpClient(serverIP, serverPort);
             stream = client.GetStream();
         }
@@ -35,6 +36,7 @@ public class TCPImageReceiver : MonoBehaviour
         {
             try
             {
+                Debug.Log("画像データをサーバーから受信中...");
                 // 画像データの長さを受信（4バイトの長さ情報）
                 byte[] lengthBytes = new byte[4];
                 int totalBytesRead = 0;

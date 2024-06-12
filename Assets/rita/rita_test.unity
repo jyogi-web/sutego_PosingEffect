@@ -386,11 +386,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 582803487}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4850c51ffcf776949bd19394917dc53d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serverIP: 
+  serverPort: 50008
 --- !u!114 &582803492
 MonoBehaviour:
   m_ObjectHideFlags: 0
