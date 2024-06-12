@@ -36,7 +36,7 @@ public class TCPImageReceiver_copy : MonoBehaviour
         {
             try
             {
-                Debug.Log("�摜�f�[�^���T�[�o�[�����M��...");
+                //Debug.Log("�摜�f�[�^���T�[�o�[�����M��...");
                 // �摜�f�[�^�̒�������M�i4�o�C�g�̒������j
                 byte[] lengthBytes = new byte[4];
                 int totalBytesRead = 0;
