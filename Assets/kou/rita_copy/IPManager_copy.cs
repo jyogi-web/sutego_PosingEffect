@@ -4,11 +4,11 @@ using System.Net.Sockets;
 
 public class IPManager_copy : MonoBehaviour
 {
-    public static string localIP_copy;
+    public string localIP;
     void Start()
     {
-        localIP_copy = GetLocalIPAddress();
-        Debug.Log("Local IP Address: " + localIP_copy);
+        localIP = GetLocalIPAddress();
+        Debug.Log("Local IP Address: " + localIP);
     }
 
     string GetLocalIPAddress()

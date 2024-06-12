@@ -352,8 +352,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1221222641}
-  - component: {fileID: 1221222640}
-  - component: {fileID: 1221222639}
+  - component: {fileID: 1221222644}
+  - component: {fileID: 1221222643}
   - component: {fileID: 1221222642}
   m_Layer: 0
   m_Name: Rita_Host
@@ -362,33 +362,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1221222639
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1221222638}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d0c18928746b79459856e187364b48f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1221222640
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1221222638}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c1ad478a310a3ab418a60233e7608194, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  displayImage: {fileID: 1555941944}
-  serverIP: 172.17.3.63
-  serverPort: 50007
 --- !u!4 &1221222641
 Transform:
   m_ObjectHideFlags: 0
@@ -413,10 +386,39 @@ MonoBehaviour:
   m_GameObject: {fileID: 1221222638}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d74dcdaeb8ed4340a8cd1cc2b49fbb3, type: 3}
+  m_Script: {fileID: 11500000, guid: caa7b1b3f9aa55042b08718b791c2028, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localIP: 172.17.3.63
+  displayImage: {fileID: 1555941944}
+  serverIP: 
+  serverPort: 50007
+--- !u!114 &1221222643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1221222638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee32aa86816c3bb4a8515bd3ed2dcf24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serverIP: 
+  serverPort: 50008
+--- !u!114 &1221222644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1221222638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6c5f2b66c8b3164289b9b82f9780ec9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localIP: 
 --- !u!1 &1554643325
 GameObject:
   m_ObjectHideFlags: 0

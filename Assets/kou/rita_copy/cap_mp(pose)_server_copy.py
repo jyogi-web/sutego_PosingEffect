@@ -4,6 +4,7 @@ import numpy as np
 import struct
 import time
 import mediapipe as mp
+import json
 
 #IPアドレス取得
 hostname = socket.gethostname()
@@ -12,7 +13,8 @@ print("local_ipを取得："+str(local_ip))
 
 # サーバーのホストとポートを設定
 HOST = local_ip
-PORT = 50007
+PORT = 50007 #キャプチャ画像用
+PORT2 =50008 #座標データ用
 
 # MediaPipeのposeモジュールを初期化(debug)
 mp_pose = mp.solutions.pose
@@ -33,15 +35,27 @@ mp_drawing_styles = mp.solutions.drawing_styles
 cap = cv2.VideoCapture(0)
 
 # TCP/IPソケットを作成し、サーバーに接続
-print("TCP/IPソケットを作成しています")
+print("画像データ用TCP/IPソケットを作成しています")
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))
-print("ソケット作成完了 -> クライアントからの接続を待ち受け中...")
+print("画像データ用ソケット作成完了")
+
+print("座標データ用TCP/IPソケットを作成しています")
+s2=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+s2.bind((HOST,PORT2))
+print("座標データ用ソケット作成完了")
+
+print("クライアントの接続を待ち受け中...")
 s.listen(1)
 conn, addr = s.accept()
-print("接続成功！")
-
+print("画像データ用クライアント接続成功")
 print('Connected by', addr)
+
+s2.listen(1)
+conn2, addr2 = s2.accept()
+print("座標データ用クライアント接続成功")
+print('connected by',addr2)
+
 
 try:
     print("キャプチャした画像を転送中...")
@@ -62,6 +76,14 @@ try:
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         # ポーズランドマークの描画(debug)
         if results.pose_landmarks:
+        # JSONデータの作成
+            pose_landmarks = {}
+            for id, landmark in enumerate(results.pose_landmarks.landmark):
+                pose_landmarks[f'landmark_{id}'] = {
+                    'x': landmark.x,
+                    'y': landmark.y,
+                    'z': landmark.z
+                }
             mp_drawing.draw_landmarks(
                 frame,
                 results.pose_landmarks,
@@ -71,12 +93,15 @@ try:
         # 画像をバイト配列に変換
         _, buffer = cv2.imencode('.jpg', frame)
         byte_data = buffer.tobytes()
-
         # 画像データの長さを送信（4バイトの長さ情報）
         conn.sendall(struct.pack('>I', len(byte_data)))  # ビッグエンディアンでエンコード
-
         # 画像データを送信
         conn.sendall(byte_data)
+
+        # JSONデータを文字列に変換してエンコード
+        json_data = json.dumps(pose_landmarks).encode('utf-8')
+        # JSONデータを転送
+        conn2.sendall(json_data)
 
         # ESCが押されたら終了
         if cv2.waitKey(1) & 0xFF == 27:
