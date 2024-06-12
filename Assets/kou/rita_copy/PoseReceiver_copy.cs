@@ -65,7 +65,7 @@ public class PoseReceiver_copy : MonoBehaviour
     NetworkStream stream;
     Thread receiveThread;
     string receivedData;
-    public Vector3[] randmarkPosition;
+    public static Vector3[] randmarkPosition;
     public Text text;
 
     void Start()
@@ -147,7 +147,7 @@ void ProcessData(string jsonData)
         // 受け取ったデータを使用する処理をここに追加
         if (randmarkPosition != null && randmarkPosition.Length > 0)
         {
-            text.text = randmarkPosition[0].x.ToString();
+            text.text = "rand1.x:" + randmarkPosition[0].x.ToString();
         }
         else
         {
