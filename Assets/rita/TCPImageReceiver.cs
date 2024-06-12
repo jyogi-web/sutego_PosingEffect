@@ -20,7 +20,7 @@ public class TCPImageReceiver : MonoBehaviour
         serverIP = Ipmanager.localIP;
         try
         {
-            Debug.Log("TCPÚ‘±¬Œ÷");
+            Debug.Log("ImageReceiver:TCPÚ‘±¬Œ÷");
             client = new TcpClient(serverIP, serverPort);
             stream = client.GetStream();
         }

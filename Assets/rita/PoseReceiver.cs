@@ -2,9 +2,13 @@ using UnityEngine;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System;
 
 public class PoseReceiver : MonoBehaviour
 {
+    IPManager Ipmanager;
+    public string serverIP;
+    public int serverPort =50008;
     TcpClient client;
     NetworkStream stream;
     Thread receiveThread;
@@ -12,11 +16,23 @@ public class PoseReceiver : MonoBehaviour
 
     void Start()
     {
-        client = new TcpClient("192.168.1.4", 50007);
-        stream = client.GetStream();
-        receiveThread = new Thread(new ThreadStart(ReceiveData));
-        receiveThread.IsBackground = true;
-        receiveThread.Start();
+        Ipmanager = GetComponent<IPManager>();
+        serverIP=Ipmanager.localIP;
+        try
+        {
+            Debug.Log("PoseReceiver:TCPæ¥ç¶šæˆåŠŸ");
+            client = new TcpClient(serverIP, serverPort);
+            stream = client.GetStream();
+            receiveThread = new Thread(new ThreadStart(ReceiveData));
+            receiveThread.IsBackground = true;
+            receiveThread.Start();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"TCPæ¥ç¶šã®é–‹å§‹ä¸­ã«ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸ: {e.Message}");
+        }
+
+
     }
 
     void ReceiveData()
@@ -33,13 +49,13 @@ public class PoseReceiver : MonoBehaviour
 
     void ProcessData(string jsonData)
     {
-        // JSONƒf[ƒ^‚ğˆ—‚·‚éƒR[ƒh‚ğ‚±‚±‚É’Ç‰Á‚µ‚Ü‚·B
+        // JSONï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Rï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É’Ç‰ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B
         Debug.Log("Received data: " + jsonData);
     }
 
     void Update()
     {
-        // •K—v‚É‰‚¶‚ÄóMƒf[ƒ^‚ğg—p‚·‚éƒR[ƒh‚ğ‚±‚±‚É’Ç‰Á‚µ‚Ü‚·B
+        // ï¿½Kï¿½vï¿½É‰ï¿½ï¿½ï¿½ï¿½Äï¿½Mï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½gï¿½pï¿½ï¿½ï¿½ï¿½Rï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É’Ç‰ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B
     }
 
     void OnApplicationQuit()
