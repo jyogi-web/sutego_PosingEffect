@@ -3,8 +3,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System;
+using Newtonsoft.Json.Linq; // JSONデータのパースに使用
 
-public class PoseReceiver : MonoBehaviour
+public class HandReceiver : MonoBehaviour
 {
     IPManager Ipmanager;
     public string serverIP;
@@ -20,7 +21,7 @@ public class PoseReceiver : MonoBehaviour
         serverIP = Ipmanager.localIP;
         try
         {
-            Debug.Log("PoseReceiver:TCP接続成功");
+            Debug.Log("HandReceiver: TCP接続成功");
             client = new TcpClient(serverIP, serverPort);
             stream = client.GetStream();
             receiveThread = new Thread(new ThreadStart(ReceiveData));
@@ -31,8 +32,6 @@ public class PoseReceiver : MonoBehaviour
         {
             Debug.LogError($"TCP接続の開始中にエラーが発生しました: {e.Message}");
         }
-
-
     }
 
     void ReceiveData()
@@ -49,7 +48,11 @@ public class PoseReceiver : MonoBehaviour
 
     void ProcessData(string jsonData)
     {
-        Debug.Log("Received data: " + jsonData);
+        // JSONデータをパース
+        JObject json = JObject.Parse(jsonData);
+        // ここで手のランドマークデータを処理
+        // 例: json["hand_0_landmark_0"]["x"] でX座標を取得
+        Debug.Log("Received hand data: " + jsonData);
     }
 
     void OnApplicationQuit()
