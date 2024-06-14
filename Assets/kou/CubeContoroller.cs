@@ -17,8 +17,8 @@ public class CubeContoroller : MonoBehaviour
     // Update is called once per frame
     void Update()
     {   
-        if (PoseReceiver_copy.randmarkPosition != null && PoseReceiver_copy.randmarkPosition.Length > 0){
-            Vector3 pos = PoseReceiver_copy.randmarkPosition[0];
+        if (PoseReceiver_kou.landmarkPosition.Length > 0){
+            Vector3 pos = PoseReceiver_kou.landmarkPosition[0];
             pos.x -= 0.5f;
             pos.y -= 0.5f;
             pos.z -= 0.5f;

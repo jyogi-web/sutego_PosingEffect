@@ -4,10 +4,10 @@ using System.Text;
 using System.Threading;
 using System;
 using System.Collections.Generic;
-using UnityEngine.UI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using UnityEngine.UI;
 
 //JSONの構造
 /*
@@ -46,7 +46,7 @@ using System.Linq;
 "31": [0.6032864451408386, 3.390183448791504, -0.19453710317611694], 
 "32": [0.4097873270511627, 3.358090877532959, 0.09582646191120148]
 }
- */
+*/
 
 [Serializable]
 public class Vector3data
@@ -56,7 +56,7 @@ public class Vector3data
     public float z;
 }
 
-public class PoseReceiver_copy : MonoBehaviour
+public class PoseReceiver_kou : MonoBehaviour
 {
     IPManager_copy Ipmanager_copy;
     public string serverIP;
@@ -65,11 +65,12 @@ public class PoseReceiver_copy : MonoBehaviour
     NetworkStream stream;
     Thread receiveThread;
     string receivedData;
-    public static Vector3[] randmarkPosition;
-    public Text text;
+    public static Vector3[] landmarkPosition;   //ランドマークVector3配列
+    //public Text Land1;
 
     void Start()
     {
+        landmarkPosition = new Vector3[32];
         Ipmanager_copy = GetComponent<IPManager_copy>();
         serverIP = Ipmanager_copy.localIP;
         try
@@ -99,20 +100,21 @@ public class PoseReceiver_copy : MonoBehaviour
         }
     }
 
-void ProcessData(string jsonData)
-{
-    // JSONデータをVector3の配列に変換
+    void ProcessData(string jsonData)
+    {      
+        // JSONデータをVector3の配列に変換
         try
         {
             var jObject = JObject.Parse(jsonData);
             var properties = jObject.Properties().ToList();
-            randmarkPosition = new Vector3[properties.Count];            int index = 0;
+            landmarkPosition = new Vector3[properties.Count];
+            int index = 0;
             foreach (var key in jObject.Properties())
             {
                 var data = key.Value.ToObject<float[]>();
                 if (data.Length == 3)
                 {
-                    randmarkPosition[index] = new Vector3(data[0], data[1], data[2]);
+                    landmarkPosition[index] = new Vector3(data[0], data[1], data[2]);
                     index++;
                 }
                 else
@@ -122,37 +124,39 @@ void ProcessData(string jsonData)
             }
             Debug.Log("Received data: " + jsonData);
         }
-    catch (JsonException e)
-    {
-        Debug.LogError($"JSON parse error: {e.Message}");
+        catch (JsonException e)
+        {
+            Debug.LogError($"JSON parse error: {e.Message}");
+        }
+        catch (ArgumentNullException e)
+        {
+            Debug.LogError($"Argument null error: {e.Message}");
+        }
+        catch (FormatException e)
+        {
+            Debug.LogError($"Format error: {e.Message}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Unexpected error: {e.Message}");
+        }
     }
-    catch (ArgumentNullException e)
-    {
-        Debug.LogError($"Argument null error: {e.Message}");
-    }
-    catch (FormatException e)
-    {
-        Debug.LogError($"Format error: {e.Message}");
-    }
-    catch (Exception e)
-    {
-        Debug.LogError($"Unexpected error: {e.Message}");
-    }
-}
 
 
 
     void Update()
     {
         // 受け取ったデータを使用する処理をここに追加
-        if (randmarkPosition != null && randmarkPosition.Length > 0)
+        /*
+        if (landmarkPosition != null && landmarkPosition.Length > 0)
         {
-            text.text = "rand1.x:" + randmarkPosition[0].x.ToString();
+            Land1.text= "rand1.x:" + landmarkPosition[0].x.ToString();
         }
         else
         {
-            text.text = "No data received";
+            Land1.text = "No data received";
         }
+        */
     }
 
     void OnApplicationQuit()
