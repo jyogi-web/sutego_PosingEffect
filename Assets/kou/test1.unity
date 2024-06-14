@@ -258,7 +258,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.21960786, g: 0.21960786, b: 0.21960786, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -299,8 +299,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -325.84, y: -134.38}
-  m_SizeDelta: {x: 120.51, y: 104.57}
+  m_AnchoredPosition: {x: -325.4301, y: -135.56}
+  m_SizeDelta: {x: 120.19, y: 104.57}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1010328130
 GameObject:
@@ -366,13 +366,13 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 10
     m_MaxSize: 40
-    m_Alignment: 0
+    m_Alignment: 1
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'rand1.x:'
+  m_Text: currentPose
 --- !u!222 &1010328133
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -716,8 +716,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 154.5076, y: -5.8674}
-  m_SizeDelta: {x: 650.9849, y: 551.7346}
+  m_AnchoredPosition: {x: 154.5076, y: -0.000029564}
+  m_SizeDelta: {x: 650.9849, y: 540}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1555941943
 MonoBehaviour:
@@ -1138,10 +1138,12 @@ MonoBehaviour:
   currentState: 0
   poseImage: {fileID: 733806143}
   poseSprites:
-  - {fileID: 0}
+  - {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 21300000, guid: 80801e98a88f0714c8d51e5d4d74fc19, type: 3}
   - {fileID: 21300000, guid: 94ba6e5976e66694c8aa1454b3b787d9, type: 3}
   - {fileID: 21300000, guid: 9ce01081a35272e4eaf2351f389ec87b, type: 3}
+  - {fileID: 21300000, guid: 5feecc7c52b21584da76372598cc6529, type: 3}
+  - {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
   checktext: {fileID: 1010328132}
 --- !u!4 &1962176516
@@ -1378,8 +1380,8 @@ SceneRoots:
   - {fileID: 2002262946}
   - {fileID: 1554643330}
   - {fileID: 514097979}
-  - {fileID: 1688291671}
-  - {fileID: 2026912932}
   - {fileID: 1221222641}
-  - {fileID: 1701632863}
   - {fileID: 1962176516}
+  - {fileID: 2026912932}
+  - {fileID: 1701632863}
+  - {fileID: 1688291671}
