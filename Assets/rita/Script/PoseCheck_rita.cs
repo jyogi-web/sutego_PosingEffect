@@ -37,6 +37,7 @@ public class PoseCheck_rita : MonoBehaviour
     //きのきの
     [SerializeField] GameObject kinokino_img;
     RectTransform kinokino_rect;
+    [SerializeField] AudioClip asobanai_se;
     //Lisp
     [SerializeField] GameObject lisp_img;
     RectTransform lisp_rect;
@@ -243,6 +244,7 @@ public class PoseCheck_rita : MonoBehaviour
                     stateEnter = false;
                     Debug.Log("pose:kinokino");
                     kinokino_img.SetActive(true);
+                    audiosource.PlayOneShot(asobanai_se);
 
                 }
                 //ポーズが変わったら
