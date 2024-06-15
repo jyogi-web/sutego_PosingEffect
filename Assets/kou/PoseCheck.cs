@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,7 +18,9 @@ public class PoseCheck : MonoBehaviour
         Glico,      //5
         Kamehameha, //6
         Stroheim,   //7
-        
+        KujoJotaro, //8
+        Giornogiovana, //9
+        HighwayStar    //10
 
     }
 
@@ -51,7 +54,7 @@ public class PoseCheck : MonoBehaviour
         /*現場猫
         //右ひざが上がっている
         //正面を向いている
-        //右左肘を曲げている*/
+        //右左肘を曲げている
         if(Isfront()&&
         IsLeftElbowBent()&&
         IsRightElbowBent()&&
@@ -59,6 +62,17 @@ public class PoseCheck : MonoBehaviour
         )
         {
             ChangeState(PoseType.Genbaneko);
+        }*/
+        /*シュトロハイム
+        *両肘が鼻より上
+        *手先が鼻より下
+        *左ひざを突き出している
+        */
+        if (Israisearm()&&
+        IsHandBelowNose()&&
+        Isupleftknee())
+        {
+            ChangeState(PoseType.Stroheim);
         }
         /*グリコ
         //左ひざが上がっている
@@ -66,10 +80,11 @@ public class PoseCheck : MonoBehaviour
         else if (Isupleftknee() &&
         Israisearm())
         {
+            Debug.Log("グリコ状態");
             ChangeState(PoseType.Glico);
         }
         //きのきの
-        else if (Pos[0].y > Pos[21].y && Pos[0].y > Pos[22].y)
+        if (Pos[0].y > Pos[21].y && Pos[0].y > Pos[22].y)
         {
             ChangeState(PoseType.Kinokino);
         }
@@ -83,6 +98,17 @@ public class PoseCheck : MonoBehaviour
         {
             ChangeState(PoseType.Hadouken);
         }
+        /*ハイウェイスター
+        *肩とひざの判定が近い
+        *手がくっついている
+        */
+        else if(
+            Ishandsoverlap()&&
+            Ismaekagami()
+        )
+        {
+            ChangeState(PoseType.HighwayStar);
+        }
         /*かめはめ波
         正面を向いている
         *手と手がある程度重なっている*/
@@ -91,40 +117,29 @@ public class PoseCheck : MonoBehaviour
         {
             ChangeState(PoseType.Kamehameha);
         }
-        /*シュトロハイム
-        *両肘が鼻より上
-        *手先が鼻より下
-        *左ひざを突き出している
-        */
-        else if (Israisearm())
-        {
-            ChangeState(PoseType.Stroheim);
-        }
         /*空条承太郎＆スタープラチナ
         *横向いている
         *手を前に突き出している
+        * どちらかの手を腰に当てている
         */
-        else if(Isside()){
-            //ChangeState(PoseType.);
+        else if(Isside()&&
+        IsUpSomeHand()&&
+        (Isnear(20,24,0.3)||
+        Isnear(21,23,0.3))){
+            ChangeState(PoseType.KujoJotaro);
         }
         /*ゴールドエクスペリエンス
         *肩の中心と右手が近い
         *左手は腰
         */
-        else if (false)
+        else if (IsHandCenter() &&
+        Isnear(15,23,0.3)
+        )   
         {
-
-        }
-        /*ハイウェイスター
-        *肩とひざの判定が近い
-        *手がくっついている
-        */
-        else if(false)
-        {
-
+            ChangeState(PoseType.Giornogiovana);
         }
         //Lispポーズ
-        else if ((Math.Abs(Pos[0].y - Pos[13].y) <= 0.1 && Math.Abs(Pos[0].x - Pos[13].x) <= 0.1) || (Math.Abs(Pos[0].y - Pos[14].y) <= 0.1 && Math.Abs(Pos[0].x - Pos[14].x) <= 0.1))
+        else if (Isnear(0,13,0.1) || Isnear(1,14,0.1))
         {
             ChangeState(PoseType.Lisp);
         }
@@ -156,12 +171,18 @@ public class PoseCheck : MonoBehaviour
 
     void UpdatePoseImage()
     {
+        int index = (int)currentState;
+        if (index < 0 || index >= poseSprites.Count)
+        {
+            Debug.LogError($"Index {index} は poseSprites リストの範囲外です。");
+        return;
+        }
         poseImage.sprite = poseSprites[(int)currentState];
     }
 
     bool Isside()
     {   
-        if (Math.Abs(Pos[11].x - Pos[12].x) < 0.15)
+        if (Math.Abs(Pos[11].x - Pos[12].x) < 0.1)
         {
             Debug.Log("横を向いています");
             return true;
@@ -170,7 +191,7 @@ public class PoseCheck : MonoBehaviour
     }
     bool Isfront()
     {
-        if (Math.Abs(Pos[11].x - Pos[12].x) > 0.15)
+        if (Math.Abs(Pos[11].x - Pos[12].x) > 0.1)
         {
             Debug.Log("正面を向いています");
             return true;
@@ -262,5 +283,62 @@ public class PoseCheck : MonoBehaviour
             return true;
         }
         return angle < thresholdAngle;
+    }
+
+    bool IsUpSomeHand()
+    {
+        if(Math.Abs(Pos[0].y - Pos[16].y) < 0.2 ||
+        Math.Abs(Pos[0].y - Pos[15].y) < 0.2)
+        {
+            Debug.Log("どちらかの手が上がっています");
+            return true;
+        }
+        return false;
+    }
+    bool IsHandCenter()
+    {
+        float thresholdDistance = 0.2f; 
+        // 左肩と右肩の中間点を計算
+        float shoulderCenter = (Pos[11].x + Pos[12].x) / 2;
+
+        // 距離がしきい値以下かどうかを判定
+        if(shoulderCenter < thresholdDistance)
+        {
+            
+            Debug.Log("手が胸の中心にあります:" + shoulderCenter);
+            return true;
+        }
+        return false;
+    }
+    bool IsHandBelowNose()
+    {
+        //判定悪
+        if(Pos[0].y < Pos[19].y && 
+        Pos[0].y < Pos[20].y)
+        {
+            Debug.Log("手が鼻より下です");
+            return true;
+        }
+        return false;
+    }
+    bool Ismaekagami()
+    {
+        //肩と腰が近い
+        if(Math.Abs(Pos[11].y - Pos[23].y) < 0.2 ||
+        Math.Abs(Pos[12].y - Pos[24].y) < 0.2)
+        {
+            Debug.Log("前かがみです");
+            return true;
+        }
+        return false;
+    }
+    bool Isnear(int a,int b,double sikii)
+    {
+        if((Math.Abs(Pos[a].y - Pos[b].y) <= sikii && Math.Abs(Pos[a].x - Pos[b].x) <= sikii))
+        {
+            Debug.Log(a+"と"+b+"が近づきました");
+            return true;
+        }
+        return false;
     }
 }
