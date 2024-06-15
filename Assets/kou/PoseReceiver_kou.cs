@@ -66,7 +66,6 @@ public class PoseReceiver_kou : MonoBehaviour
     Thread receiveThread;
     string receivedData;
     public static Vector3[] landmarkPosition;   //ランドマークVector3配列
-    //public Text Land1;
 
     void Start()
     {
@@ -122,7 +121,7 @@ public class PoseReceiver_kou : MonoBehaviour
                     Debug.LogError($"Invalid data length for key {key.Name}: expected 3 but got {data.Length}");
                 }
             }
-            Debug.Log("Received data: " + jsonData);
+            //Debug.Log("Received data: " + jsonData);
         }
         catch (JsonException e)
         {
@@ -146,17 +145,7 @@ public class PoseReceiver_kou : MonoBehaviour
 
     void Update()
     {
-        // 受け取ったデータを使用する処理をここに追加
-        /*
-        if (landmarkPosition != null && landmarkPosition.Length > 0)
-        {
-            Land1.text= "rand1.x:" + landmarkPosition[0].x.ToString();
-        }
-        else
-        {
-            Land1.text = "No data received";
-        }
-        */
+        
     }
 
     void OnApplicationQuit()
