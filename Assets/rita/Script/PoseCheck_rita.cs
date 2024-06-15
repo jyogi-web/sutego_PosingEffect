@@ -39,12 +39,13 @@ public class PoseCheck_rita : MonoBehaviour
         
         // ここでポーズの位置に応じたステート変更を行う
         //Lispポーズ
-        if (Math.Abs(Pos[0].y - Pos[13].y) <= 0.1 || Math.Abs(Pos[0].x - Pos[13].x) <= 0.1)
+        if (Math.Abs(Pos[0].y - Pos[13].y) <= 0.1 && Math.Abs(Pos[0].x - Pos[13].x) <= 0.2
+            || Math.Abs(Pos[0].y - Pos[14].y) <= 0.1&& Math.Abs(Pos[0].x - Pos[14].x) <= 0.2)
         {
             ChangeState(PoseType.Lisp);
         }
         //きのきの
-        else if (Pos[0].y < Pos[21].y && Pos[0].y < Pos[22].y)
+        else if (Pos[0].y > Pos[19].y && Pos[0].y > Pos[20].y)
         {
             ChangeState(PoseType.Kinokino);
         }
