@@ -84,7 +84,8 @@ public class PoseCheck : MonoBehaviour
             ChangeState(PoseType.Glico);
         }
         //きのきの
-        if (Pos[0].y > Pos[21].y && Pos[0].y > Pos[22].y)
+        else if (Pos[0].y > Pos[21].y && Pos[0].y > Pos[22].y &&
+        IsElbowBelowNose())
         {
             ChangeState(PoseType.Kinokino);
         }
@@ -117,17 +118,6 @@ public class PoseCheck : MonoBehaviour
         {
             ChangeState(PoseType.Kamehameha);
         }
-        /*空条承太郎＆スタープラチナ
-        *横向いている
-        *手を前に突き出している
-        * どちらかの手を腰に当てている
-        */
-        else if(Isside()&&
-        IsUpSomeHand()&&
-        (Isnear(20,24,0.3)||
-        Isnear(21,23,0.3))){
-            ChangeState(PoseType.KujoJotaro);
-        }
         /*ゴールドエクスペリエンス
         *肩の中心と右手が近い
         *左手は腰
@@ -138,11 +128,26 @@ public class PoseCheck : MonoBehaviour
         {
             ChangeState(PoseType.Giornogiovana);
         }
+        /*空条承太郎＆スタープラチナ
+        *横向いている
+        *手を前に突き出している
+        *どちらかの手を腰に当てている
+        *正面に対応
+        */
+        else if(//Isside()&&
+        IsUpSomeHand()&&
+        (Isnear(20,24,0.3) || Isnear(21,23,0.3))){
+            ChangeState(PoseType.KujoJotaro);
+        }
         //Lispポーズ
         else if (Isnear(0,13,0.1) || Isnear(1,14,0.1))
         {
             ChangeState(PoseType.Lisp);
         }
+        /*ボンボルド
+        *
+        *
+        */
         else if(false)
         {
             ChangeState(PoseType.Bondold);
@@ -179,7 +184,7 @@ public class PoseCheck : MonoBehaviour
         if (index < 0 || index >= poseSprites.Count)
         {
             Debug.LogError($"Index {index} は poseSprites リストの範囲外です。");
-        return;
+            return;
         }
         poseImage.sprite = poseSprites[(int)currentState];
     }
@@ -304,7 +309,7 @@ public class PoseCheck : MonoBehaviour
         float thresholdDistance = 0.15f; 
         // 左肩と右肩の中間点を計算
         float shoulderCenter = (Pos[11].x + Pos[12].x) / 2;
-        Debug.Log("中心点：" + shoulderCenter);
+        //Debug.Log("中心点：" + shoulderCenter);
 
         // 距離がしきい値以下かどうかを判定
         if(Math.Abs(shoulderCenter - Pos[20].x) < thresholdDistance)
@@ -322,6 +327,26 @@ public class PoseCheck : MonoBehaviour
         Pos[0].y < Pos[20].y)
         {
             Debug.Log("手が鼻より下です");
+            return true;
+        }
+        return false;
+    }
+    bool IsElbowBelowNose()
+    {
+        Debug.Log("Pos[0]:" + Pos[0].y + "Pos[14]:"+ Pos[14].y + "Pos[13]:"+ Pos[13].y);
+        if(Pos[0].y < Pos[14].y)
+        {
+            Debug.Log("右ひじが鼻より下です");
+        }
+        if(Pos[0].y < Pos[13].y)
+        {
+            Debug.Log("左ひじが鼻より下です");
+        }
+        //判定悪
+        if(Pos[0].y < Pos[14].y && 
+        Pos[0].y < Pos[13].y)
+        {
+            Debug.Log("肘が鼻より下です");
             return true;
         }
         return false;
