@@ -44,6 +44,7 @@ public class PoseCheck : MonoBehaviour
         Pos = PoseReceiver_kou.landmarkPosition;  // 毎フレーム位置を更新
         
         //デバッグ用
+        /*
         Isside();
         Isfront();
         Israisearm();
@@ -51,6 +52,7 @@ public class PoseCheck : MonoBehaviour
         Ishandfront();
         Isupleftknee();
         IsUpRightKnee();
+        */
         // ここでポーズの位置に応じたステート変更を行う
         /*現場猫
         //右ひざが上がっている
@@ -119,17 +121,20 @@ public class PoseCheck : MonoBehaviour
             ChangeState(PoseType.Kamehameha);
         }
         /*ゴールドエクスペリエンス
-        *肩の中心と右手が近い
-        *左手は腰
+        *--肩の中心と右手が近い--
+        *→右肩と右手が近いx,y座標
+        * 右肩と右ひじが遠い
+        *左手は腰に近い
         */
-        else if (IsHandCenter() &&
+        else if (Isnear(16,12,0.1) &&
+        Isfar(14,12,0.05) &&
         Isnear(15,23,0.2)
         )   
         {
             ChangeState(PoseType.Giornogiovana);
         }
         /*空条承太郎＆スタープラチナ
-        *横向いている
+        *--横向いている--
         *手を前に突き出している
         *どちらかの手を腰に当てている
         *正面に対応
@@ -354,8 +359,8 @@ public class PoseCheck : MonoBehaviour
     bool Ismaekagami()
     {
         //肩と腰が近い
-        if(Math.Abs(Pos[11].y - Pos[23].y) < 0.4 ||
-        Math.Abs(Pos[12].y - Pos[24].y) < 0.4)
+        if(Math.Abs(Pos[11].y - Pos[23].y) < 0.2 ||
+        Math.Abs(Pos[12].y - Pos[24].y) < 0.2)
         {
             Debug.Log("前かがみです");
             return true;
@@ -367,6 +372,15 @@ public class PoseCheck : MonoBehaviour
         if(Math.Abs(Pos[a].y - Pos[b].y) <= sikii && Math.Abs(Pos[a].x - Pos[b].x) <= sikii)
         {
             Debug.Log(a+"と"+b+"が近づきました");
+            return true;
+        }
+        return false;
+    }
+    bool Isfar(int a,int b,double sikii)
+    {
+        if(Math.Abs(Pos[a].y - Pos[b].y) >= sikii && Math.Abs(Pos[a].x - Pos[b].x) >= sikii)
+        {
+            Debug.Log(a+"と"+b+"は遠いです");
             return true;
         }
         return false;
