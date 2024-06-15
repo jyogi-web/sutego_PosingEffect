@@ -150,6 +150,7 @@ public class PoseCheck : MonoBehaviour
             UpdatePoseImage();
             // ステート変更時の処理をここに追加
             checktext.text = newState.ToString();
+
         }
     }
 
