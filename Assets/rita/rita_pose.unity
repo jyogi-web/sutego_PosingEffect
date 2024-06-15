@@ -884,6 +884,7 @@ MonoBehaviour:
   newState: 0
   checktext: {fileID: 931710114}
   kinokino_img: {fileID: 652247948}
+  asobanai_se: {fileID: 8300000, guid: 5ff9eb8ae9b50294ebbc9f80264fb078, type: 3}
   lisp_img: {fileID: 687208637}
   hadoukenL_anime: {fileID: 1681719740}
   hadouken_se: {fileID: 8300000, guid: 39c65dc7165c55c4f82eadb305493a6c, type: 3}
