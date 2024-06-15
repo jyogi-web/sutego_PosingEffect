@@ -15,7 +15,10 @@ public class PoseCheck : MonoBehaviour
         Hadouken,   //3
         Genbaneko,  //4
         Glico,      //5
-        Kamehameha  //6
+        Kamehameha, //6
+        Stroheim,   //7
+        
+
     }
 
     public PoseType currentState;
@@ -27,7 +30,7 @@ public class PoseCheck : MonoBehaviour
     void Start()
     {
         Pos = PoseReceiver_kou.landmarkPosition;
-        currentState = PoseType.Lisp;  // 初期ステートを設定
+        currentState = PoseType.None;  // 初期ステートを設定
         UpdatePoseImage();
     }
 
@@ -45,10 +48,10 @@ public class PoseCheck : MonoBehaviour
         Isupleftknee();
         IsUpRightKnee();
         // ここでポーズの位置に応じたステート変更を行う
-        //現場猫
+        /*現場猫
         //右ひざが上がっている
         //正面を向いている
-        //右左肘を曲げている
+        //右左肘を曲げている*/
         if(Isfront()&&
         IsLeftElbowBent()&&
         IsRightElbowBent()&&
@@ -57,9 +60,9 @@ public class PoseCheck : MonoBehaviour
         {
             ChangeState(PoseType.Genbaneko);
         }
-        //グリコ
+        /*グリコ
         //左ひざが上がっている
-        //両手が上がっている
+        //両手が上がっている*/
         else if (Isupleftknee() &&
         Israisearm())
         {
@@ -70,8 +73,8 @@ public class PoseCheck : MonoBehaviour
         {
             ChangeState(PoseType.Kinokino);
         }
-        //波動拳
-        /*横を向いている
+        /*波動拳
+        横を向いている
         *両手を前に突き出している
         *手と手がある程度重なっている*/
         else if (Isside()&&
@@ -80,25 +83,48 @@ public class PoseCheck : MonoBehaviour
         {
             ChangeState(PoseType.Hadouken);
         }
-        //かめはめ波
-        //正面を向いている
-        //手と手がある程度重なっている
+        /*かめはめ波
+        正面を向いている
+        *手と手がある程度重なっている*/
         else if (Isfront()&&
         Ishandsoverlap())
         {
             ChangeState(PoseType.Kamehameha);
         }
-        //スタープラチナ
-        /*else if (Pos[12].x > Pos[11].x)
+        /*シュトロハイム
+        *両肘が鼻より上
+        *手先が鼻より下
+        *左ひざを突き出している
+        */
+        else if (Israisearm())
         {
-            ChangeState(PoseType.Jojo);
-        }*/
-        /*
-        else if(){
+            ChangeState(PoseType.Stroheim);
+        }
+        /*空条承太郎＆スタープラチナ
+        *横向いている
+        *手を前に突き出している
+        */
+        else if(Isside()){
+            //ChangeState(PoseType.);
+        }
+        /*ゴールドエクスペリエンス
+        *肩の中心と右手が近い
+        *左手は腰
+        */
+        else if (false)
+        {
 
-        }*/
+        }
+        /*ハイウェイスター
+        *肩とひざの判定が近い
+        *手がくっついている
+        */
+        else if(false)
+        {
+
+        }
         //Lispポーズ
-        else if ((Math.Abs(Pos[0].y - Pos[13].y) <= 0.1 && Math.Abs(Pos[0].x - Pos[13].x) <= 0.1) ||(Math.Abs(Pos[0].y - Pos[14].y) <= 0.1 && Math.Abs(Pos[0].x - Pos[14].x) <= 0.1))
+        else if ((Math.Abs(Pos[0].y - Pos[13].y) <= 0.1 && Math.Abs(Pos[0].x - Pos[13].x) <= 0.1) || (Math.Abs(Pos[0].y - Pos[14].y) <= 0.1 && Math.Abs(Pos[0].x - Pos[14].x) <= 0.1))
         {
             ChangeState(PoseType.Lisp);
         }
@@ -174,6 +200,7 @@ public class PoseCheck : MonoBehaviour
     }
     bool Isupleftknee()
     {
+        //左ひざが右ひざより上
         if(Pos[25].y < Pos[26].y)
         {
             
@@ -184,14 +211,14 @@ public class PoseCheck : MonoBehaviour
     }
     bool IsUpRightKnee()
     {
+        //右ひざが左ひざより上
         if(Pos[25].y > Pos[26].y)
         {
             Debug.Log("右ひざが上がっています");
             return true;
         }
         return false;
-    }
-    
+    } 
     bool Ishandfront()
     {
         if(Math.Abs(Pos[12].y - Pos[16].y) < 0.2 &&
@@ -202,7 +229,6 @@ public class PoseCheck : MonoBehaviour
         }
         return false;
     }
-
     bool IsLeftElbowBent()
     {
         float thresholdAngle = 160f;
