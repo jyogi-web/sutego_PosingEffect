@@ -20,7 +20,8 @@ public class PoseCheck : MonoBehaviour
         Stroheim,   //7
         KujoJotaro, //8
         Giornogiovana, //9
-        HighwayStar    //10
+        HighwayStar,    //10
+        Bondold     //11
 
     }
 
@@ -80,7 +81,6 @@ public class PoseCheck : MonoBehaviour
         else if (Isupleftknee() &&
         Israisearm())
         {
-            Debug.Log("グリコ状態");
             ChangeState(PoseType.Glico);
         }
         //きのきの
@@ -133,7 +133,7 @@ public class PoseCheck : MonoBehaviour
         *左手は腰
         */
         else if (IsHandCenter() &&
-        Isnear(15,23,0.3)
+        Isnear(15,23,0.2)
         )   
         {
             ChangeState(PoseType.Giornogiovana);
@@ -142,6 +142,10 @@ public class PoseCheck : MonoBehaviour
         else if (Isnear(0,13,0.1) || Isnear(1,14,0.1))
         {
             ChangeState(PoseType.Lisp);
+        }
+        else if(false)
+        {
+            ChangeState(PoseType.Bondold);
         }
         else
         {
@@ -297,15 +301,16 @@ public class PoseCheck : MonoBehaviour
     }
     bool IsHandCenter()
     {
-        float thresholdDistance = 0.2f; 
+        float thresholdDistance = 0.15f; 
         // 左肩と右肩の中間点を計算
         float shoulderCenter = (Pos[11].x + Pos[12].x) / 2;
+        Debug.Log("中心点：" + shoulderCenter);
 
         // 距離がしきい値以下かどうかを判定
-        if(shoulderCenter < thresholdDistance)
+        if(Math.Abs(shoulderCenter - Pos[20].x) < thresholdDistance)
         {
             
-            Debug.Log("手が胸の中心にあります:" + shoulderCenter);
+            Debug.Log("手が胸の中心にあります:" + Pos[20].x);
             return true;
         }
         return false;
@@ -324,8 +329,8 @@ public class PoseCheck : MonoBehaviour
     bool Ismaekagami()
     {
         //肩と腰が近い
-        if(Math.Abs(Pos[11].y - Pos[23].y) < 0.2 ||
-        Math.Abs(Pos[12].y - Pos[24].y) < 0.2)
+        if(Math.Abs(Pos[11].y - Pos[23].y) < 0.4 ||
+        Math.Abs(Pos[12].y - Pos[24].y) < 0.4)
         {
             Debug.Log("前かがみです");
             return true;
@@ -334,7 +339,7 @@ public class PoseCheck : MonoBehaviour
     }
     bool Isnear(int a,int b,double sikii)
     {
-        if((Math.Abs(Pos[a].y - Pos[b].y) <= sikii && Math.Abs(Pos[a].x - Pos[b].x) <= sikii))
+        if(Math.Abs(Pos[a].y - Pos[b].y) <= sikii && Math.Abs(Pos[a].x - Pos[b].x) <= sikii)
         {
             Debug.Log(a+"と"+b+"が近づきました");
             return true;
