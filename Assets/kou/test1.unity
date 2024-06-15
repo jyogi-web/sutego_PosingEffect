@@ -258,7 +258,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.21960786, g: 0.21960786, b: 0.21960786, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1138,11 +1138,14 @@ MonoBehaviour:
   currentState: 0
   poseImage: {fileID: 733806143}
   poseSprites:
-  - {fileID: 0}
+  - {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 21300000, guid: 80801e98a88f0714c8d51e5d4d74fc19, type: 3}
+  - {fileID: 21300000, guid: bdfe27ddf6bf2464b900f2b38cf0708d, type: 3}
+  - {fileID: 21300000, guid: 65f37f65f88f22b418f8961c1e40d8fc, type: 3}
+  - {fileID: 21300000, guid: e9eb92e8f7b932e4b9d9b0dcab747525, type: 3}
+  - {fileID: 21300000, guid: 53155111fe84956469ee105d217d3174, type: 3}
   - {fileID: 21300000, guid: 94ba6e5976e66694c8aa1454b3b787d9, type: 3}
   - {fileID: 21300000, guid: 9ce01081a35272e4eaf2351f389ec87b, type: 3}
-  - {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
   checktext: {fileID: 1010328132}
 --- !u!4 &1962176516
 Transform:
