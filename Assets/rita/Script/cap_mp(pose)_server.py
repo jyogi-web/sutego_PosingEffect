@@ -79,11 +79,12 @@ try:
         # JSONデータの作成
             pose_landmarks = {}
             for id, landmark in enumerate(results.pose_landmarks.landmark):
-                pose_landmarks[f'landmark_{id}'] = {
-                    'x': landmark.x,
-                    'y': landmark.y,
-                    'z': landmark.z
-                }
+                pose_landmarks[f'{id}'] = [
+                    round(landmark.x,3),
+                    round(landmark.y,3),
+                    round(landmark.z,3)
+                ]
+                
             mp_drawing.draw_landmarks(
                 frame,
                 results.pose_landmarks,

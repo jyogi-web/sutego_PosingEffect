@@ -3,6 +3,19 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Linq;
+using UnityEngine.UI;
+
+[Serializable]
+public class Vector3data_rita
+{
+    public float x;
+    public float y;
+    public float z;
+}
 
 public class PoseReceiver : MonoBehaviour
 {
@@ -13,9 +26,11 @@ public class PoseReceiver : MonoBehaviour
     NetworkStream stream;
     Thread receiveThread;
     string receivedData;
+    public static Vector3[] landmarkPosition;   //ランドマークVector3配列
 
     void Start()
     {
+        landmarkPosition = new Vector3[32];
         Ipmanager = GetComponent<IPManager>();
         serverIP = Ipmanager.localIP;
         try
@@ -49,7 +64,44 @@ public class PoseReceiver : MonoBehaviour
 
     void ProcessData(string jsonData)
     {
-        Debug.Log("Received data: " + jsonData);
+        // JSONデータをVector3の配列に変換
+        try
+        {
+            var jObject = JObject.Parse(jsonData);
+            var properties = jObject.Properties().ToList();
+            landmarkPosition = new Vector3[properties.Count];
+            int index = 0;
+            foreach (var key in jObject.Properties())
+            {
+                var data = key.Value.ToObject<float[]>();
+                if (data.Length == 3)
+                {
+                    landmarkPosition[index] = new Vector3(data[0], data[1], data[2]);
+                    index++;
+                }
+                else
+                {
+                    Debug.LogError($"Invalid data length for key {key.Name}: expected 3 but got {data.Length}");
+                }
+            }
+            Debug.Log("Received data: " + jsonData);
+        }
+        catch (JsonException e)
+        {
+            Debug.LogError($"JSON parse error: {e.Message}");
+        }
+        catch (ArgumentNullException e)
+        {
+            Debug.LogError($"Argument null error: {e.Message}");
+        }
+        catch (FormatException e)
+        {
+            Debug.LogError($"Format error: {e.Message}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Unexpected error: {e.Message}");
+        }
     }
 
     void OnApplicationQuit()
