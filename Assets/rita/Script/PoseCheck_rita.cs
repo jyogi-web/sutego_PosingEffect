@@ -19,6 +19,9 @@ public class PoseCheck_rita : MonoBehaviour
         Glico,
         Kamehameha,
         Stroheim,
+        KujoJotaro,
+        Giornogiovana,
+        HighwayStar
     }
 
     bool stateEnter = true;
@@ -107,6 +110,17 @@ public class PoseCheck_rita : MonoBehaviour
         {
             ChangeState(PoseType.Hadouken_r);
         }
+        /*ハイウェイスター
+        *肩とひざの判定が近い
+        *手がくっついている
+        */
+        else if (
+            Ishandsoverlap() &&
+            Ismaekagami()
+        )
+        {
+            ChangeState(PoseType.HighwayStar);
+        }
         /*かめはめ波
         正面を向いている
         *手と手がある程度重なっている*/
@@ -120,9 +134,33 @@ public class PoseCheck_rita : MonoBehaviour
         *手先が鼻より下
         *左ひざを突き出している
         */
-        else if (Israisearm())
+        else if (Israisearm() &&
+        IsHandBelowNose() &&
+        Isupleftknee())
         {
             ChangeState(PoseType.Stroheim);
+        }
+        /*空条承太郎＆スタープラチナ
+        *横向いている
+        *手を前に突き出している
+        * どちらかの手を腰に当てている
+        */
+        else if (Isside() &&
+        IsUpSomeHand() &&
+        (Isnear(20, 24, 0.3) ||
+        Isnear(21, 23, 0.3)))
+        {
+            ChangeState(PoseType.KujoJotaro);
+        }
+        /*ゴールドエクスペリエンス
+        *肩の中心と右手が近い
+        *左手は腰
+        */
+        else if (IsHandCenter() &&
+        Isnear(15, 23, 0.3)
+        )
+        {
+            ChangeState(PoseType.Giornogiovana);
         }
         //Lispポーズ
         else if (Math.Abs(Pos[0].y - Pos[13].y) <= 0.1 && Math.Abs(Pos[0].x - Pos[13].x) <= 0.2
@@ -429,6 +467,62 @@ public class PoseCheck_rita : MonoBehaviour
             return true;
         }
         return angle < thresholdAngle;
+    }
+    bool IsUpSomeHand()
+    {
+        if (Math.Abs(Pos[0].y - Pos[16].y) < 0.2 ||
+        Math.Abs(Pos[0].y - Pos[15].y) < 0.2)
+        {
+            Debug.Log("どちらかの手が上がっています");
+            return true;
+        }
+        return false;
+    }
+    bool IsHandCenter()
+    {
+        float thresholdDistance = 0.2f;
+        // 左肩と右肩の中間点を計算
+        float shoulderCenter = (Pos[11].x + Pos[12].x) / 2;
+
+        // 距離がしきい値以下かどうかを判定
+        if (shoulderCenter < thresholdDistance)
+        {
+
+            Debug.Log("手が胸の中心にあります:" + shoulderCenter);
+            return true;
+        }
+        return false;
+    }
+    bool IsHandBelowNose()
+    {
+        //判定悪
+        if (Pos[0].y < Pos[19].y &&
+        Pos[0].y < Pos[20].y)
+        {
+            Debug.Log("手が鼻より下です");
+            return true;
+        }
+        return false;
+    }
+    bool Ismaekagami()
+    {
+        //肩と腰が近い
+        if (Math.Abs(Pos[11].y - Pos[23].y) < 0.2 ||
+        Math.Abs(Pos[12].y - Pos[24].y) < 0.2)
+        {
+            Debug.Log("前かがみです");
+            return true;
+        }
+        return false;
+    }
+    bool Isnear(int a, int b, double sikii)
+    {
+        if ((Math.Abs(Pos[a].y - Pos[b].y) <= sikii && Math.Abs(Pos[a].x - Pos[b].x) <= sikii))
+        {
+            Debug.Log(a + "と" + b + "が近づきました");
+            return true;
+        }
+        return false;
     }
 
 }
