@@ -28,6 +28,8 @@ public class PoseCheck_rita : MonoBehaviour
     //test用
     [SerializeField] Text checktext;
 
+    AudioSource audiosource;
+
     /*各ポーズエフェクト*/
     //きのきの
     [SerializeField] GameObject kinokino_img;
@@ -38,6 +40,7 @@ public class PoseCheck_rita : MonoBehaviour
     //波動拳L
     [SerializeField] GameObject hadoukenL_anime;
     RectTransform hadoukenL_rect;
+    [SerializeField]AudioClip hadouken_se;
     //波動拳R
     [SerializeField] GameObject hadoukenR_anime;
     RectTransform hadoukenR_rect;
@@ -53,6 +56,8 @@ public class PoseCheck_rita : MonoBehaviour
     {
         Pos = PoseReceiver.landmarkPosition;
         currentState = PoseType.None;  // 初期ステートを設定
+
+        audiosource = GetComponent<AudioSource>();
 
         //エフェクトのRectTransform取得
         kinokino_rect = kinokino_img.GetComponent<RectTransform>();
@@ -217,6 +222,7 @@ public class PoseCheck_rita : MonoBehaviour
                     Debug.Log("pose:hadoukenL");
                     hadoukenL_anime.SetActive(true);
                     ImageTrack(15, hadoukenL_rect);
+                    audiosource.PlayOneShot(hadouken_se);
 
                 }
                 //ポーズが変わったら
@@ -242,6 +248,7 @@ public class PoseCheck_rita : MonoBehaviour
                     Debug.Log("pose:hadoukenR");
                     hadoukenR_anime.SetActive(true);
                     ImageTrack(15, hadoukenR_rect);
+                    audiosource.PlayOneShot(hadouken_se);
 
                 }
                 //ポーズが変わったら
