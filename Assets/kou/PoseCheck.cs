@@ -20,7 +20,9 @@ public class PoseCheck : MonoBehaviour
         Stroheim,   //7
         KujoJotaro, //8
         Giornogiovana, //9
-        HighwayStar    //10
+        HighwayStar,//10
+        DIO,        //11
+        Killerqueen //12
 
     }
 
@@ -43,6 +45,7 @@ public class PoseCheck : MonoBehaviour
         Pos = PoseReceiver_kou.landmarkPosition;  // 毎フレーム位置を更新
         
         //デバッグ用
+        /*
         Isside();
         Isfront();
         Israisearm();
@@ -50,6 +53,7 @@ public class PoseCheck : MonoBehaviour
         Ishandfront();
         Isupleftknee();
         IsUpRightKnee();
+        */
         // ここでポーズの位置に応じたステート変更を行う
         /*現場猫
         //右ひざが上がっている
@@ -69,8 +73,8 @@ public class PoseCheck : MonoBehaviour
         *左ひざを突き出している
         */
         if (Israisearm()&&
-        IsHandBelowNose()&&
-        Isupleftknee())
+        //IsHandBelowNose()&&
+        IsUpRightKnee())
         {
             ChangeState(PoseType.Stroheim);
         }
@@ -80,11 +84,11 @@ public class PoseCheck : MonoBehaviour
         else if (Isupleftknee() &&
         Israisearm())
         {
-            Debug.Log("グリコ状態");
             ChangeState(PoseType.Glico);
         }
         //きのきの
-        if (Pos[0].y > Pos[21].y && Pos[0].y > Pos[22].y)
+        else if (Pos[0].y > Pos[21].y && Pos[0].y > Pos[22].y &&
+        IsElbowBelowNose())
         {
             ChangeState(PoseType.Kinokino);
         }
@@ -117,23 +121,15 @@ public class PoseCheck : MonoBehaviour
         {
             ChangeState(PoseType.Kamehameha);
         }
-        /*空条承太郎＆スタープラチナ
-        *横向いている
-        *手を前に突き出している
-        * どちらかの手を腰に当てている
-        */
-        else if(Isside()&&
-        IsUpSomeHand()&&
-        (Isnear(20,24,0.3)||
-        Isnear(21,23,0.3))){
-            ChangeState(PoseType.KujoJotaro);
-        }
         /*ゴールドエクスペリエンス
-        *肩の中心と右手が近い
-        *左手は腰
+        *--肩の中心と右手が近い--
+        *→右肩と右手が近いx,y座標
+        * 右肩と右ひじが遠い
+        *左手は腰に近い
         */
-        else if (IsHandCenter() &&
-        Isnear(15,23,0.3)
+        else if (Isnear(16,12,0.1) &&
+        Isfar(14,12,0.05) &&
+        Isnear(15,23,0.2)
         )   
         {
             ChangeState(PoseType.Giornogiovana);
@@ -142,6 +138,34 @@ public class PoseCheck : MonoBehaviour
         else if (Isnear(0,13,0.1) || Isnear(1,14,0.1))
         {
             ChangeState(PoseType.Lisp);
+        }
+        /*DIO
+        * 横一文字
+        * 16<14<12<11<13<15.x
+        * 保留
+        */
+        else if(false)
+        {
+            ChangeState(PoseType.DIO);
+        }
+        /*キラークイーン
+        * 腕組んでる
+        * 正面向いている
+        */
+        else if(Isudekumi()&& Isfront())
+        {
+            ChangeState(PoseType.Killerqueen);
+        }
+        /*空条承太郎＆スタープラチナ
+        *--横向いている--
+        *手を前に突き出している
+        *どちらかの手を腰に当てている
+        *正面に対応
+        */
+        else if(//Isside()&&
+        IsUpSomeHand()&&
+        (Isnear(20,24,0.3) || Isnear(21,23,0.3))){
+            ChangeState(PoseType.KujoJotaro);
         }
         else
         {
@@ -175,7 +199,7 @@ public class PoseCheck : MonoBehaviour
         if (index < 0 || index >= poseSprites.Count)
         {
             Debug.LogError($"Index {index} は poseSprites リストの範囲外です。");
-        return;
+            return;
         }
         poseImage.sprite = poseSprites[(int)currentState];
     }
@@ -212,8 +236,8 @@ public class PoseCheck : MonoBehaviour
     bool Ishandsoverlap()
     {
         //両手のxy座標が近い
-        if(Math.Abs(Pos[15].y - Pos[16].y) < 0.1 &&
-        Math.Abs(Pos[15].x - Pos[16].x) < 0.1)
+        if(Math.Abs(Pos[15].y - Pos[16].y) < 0.05 &&
+        Math.Abs(Pos[15].x - Pos[16].x) < 0.05)
         {
             Debug.Log("両手が重なっています");
             return true;
@@ -223,7 +247,8 @@ public class PoseCheck : MonoBehaviour
     bool Isupleftknee()
     {
         //左ひざが右ひざより上
-        if(Pos[25].y < Pos[26].y)
+        //要修正（ある程度離れたら）
+        if((Pos[26].y-Pos[25].y) > 0.05)
         {
             
             Debug.Log("左ひざが上がっています");
@@ -234,7 +259,7 @@ public class PoseCheck : MonoBehaviour
     bool IsUpRightKnee()
     {
         //右ひざが左ひざより上
-        if(Pos[25].y > Pos[26].y)
+        if((Pos[25].y - Pos[26].y) > 0.05)
         {
             Debug.Log("右ひざが上がっています");
             return true;
@@ -297,15 +322,16 @@ public class PoseCheck : MonoBehaviour
     }
     bool IsHandCenter()
     {
-        float thresholdDistance = 0.2f; 
+        float thresholdDistance = 0.15f; 
         // 左肩と右肩の中間点を計算
         float shoulderCenter = (Pos[11].x + Pos[12].x) / 2;
+        //Debug.Log("中心点：" + shoulderCenter);
 
         // 距離がしきい値以下かどうかを判定
-        if(shoulderCenter < thresholdDistance)
+        if(Math.Abs(shoulderCenter - Pos[20].x) < thresholdDistance)
         {
             
-            Debug.Log("手が胸の中心にあります:" + shoulderCenter);
+            Debug.Log("手が胸の中心にあります:" + Pos[20].x);
             return true;
         }
         return false;
@@ -321,6 +347,26 @@ public class PoseCheck : MonoBehaviour
         }
         return false;
     }
+    bool IsElbowBelowNose()
+    {
+        Debug.Log("Pos[0]:" + Pos[0].y + "Pos[14]:"+ Pos[14].y + "Pos[13]:"+ Pos[13].y);
+        if(Pos[0].y < Pos[14].y)
+        {
+            Debug.Log("右ひじが鼻より下です");
+        }
+        if(Pos[0].y < Pos[13].y)
+        {
+            Debug.Log("左ひじが鼻より下です");
+        }
+        //判定悪
+        if(Pos[0].y < Pos[14].y && 
+        Pos[0].y < Pos[13].y)
+        {
+            Debug.Log("肘が鼻より下です");
+            return true;
+        }
+        return false;
+    }
     bool Ismaekagami()
     {
         //肩と腰が近い
@@ -332,11 +378,31 @@ public class PoseCheck : MonoBehaviour
         }
         return false;
     }
+    bool Isudekumi()
+    {
+        //右手と左ひじ
+        //左手と右ひじ
+        if(Isnear(14,15,0.1)&& Isnear(13,16,0.1))
+        {
+            Debug.Log("腕を組んでいます");
+            return true;
+        }
+        return false;
+    }
     bool Isnear(int a,int b,double sikii)
     {
-        if((Math.Abs(Pos[a].y - Pos[b].y) <= sikii && Math.Abs(Pos[a].x - Pos[b].x) <= sikii))
+        if(Math.Abs(Pos[a].y - Pos[b].y) <= sikii && Math.Abs(Pos[a].x - Pos[b].x) <= sikii)
         {
             Debug.Log(a+"と"+b+"が近づきました");
+            return true;
+        }
+        return false;
+    }
+    bool Isfar(int a,int b,double sikii)
+    {
+        if(Math.Abs(Pos[a].y - Pos[b].y) >= sikii && Math.Abs(Pos[a].x - Pos[b].x) >= sikii)
+        {
+            Debug.Log(a+"と"+b+"は遠いです");
             return true;
         }
         return false;
