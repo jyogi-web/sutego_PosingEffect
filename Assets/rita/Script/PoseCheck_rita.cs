@@ -14,7 +14,8 @@ public class PoseCheck_rita : MonoBehaviour
         None,
         Lisp,
         Kinokino,
-        Hadouken,
+        Hadouken_l,
+        Hadouken_r,
         Glico,
         Kamehameha,
         Stroheim,
@@ -34,9 +35,12 @@ public class PoseCheck_rita : MonoBehaviour
     //Lisp
     [SerializeField] GameObject lisp_img;
     RectTransform lisp_rect;
-    //波動拳
-    [SerializeField] GameObject hadouken_anime;
-    RectTransform hadouken_rect;
+    //波動拳L
+    [SerializeField] GameObject hadoukenL_anime;
+    RectTransform hadoukenL_rect;
+    //波動拳R
+    [SerializeField] GameObject hadoukenR_anime;
+    RectTransform hadoukenR_rect;
     //グリコ
     [SerializeField] GameObject glico_img;
     RectTransform glico_rect;
@@ -53,8 +57,9 @@ public class PoseCheck_rita : MonoBehaviour
         //エフェクトのRectTransform取得
         kinokino_rect = kinokino_img.GetComponent<RectTransform>();
         lisp_rect=lisp_img.GetComponent<RectTransform>();
-        hadouken_rect=hadouken_anime.GetComponent<RectTransform>();
-        glico_rect=glico_img.GetComponent<RectTransform>();
+        hadoukenL_rect=hadoukenL_anime.GetComponent<RectTransform>();
+        hadoukenR_rect = hadoukenR_anime.GetComponent<RectTransform>();
+        glico_rect =glico_img.GetComponent<RectTransform>();
     }
 
     // Update is called once per frame
@@ -77,15 +82,25 @@ public class PoseCheck_rita : MonoBehaviour
         {
             ChangeState(PoseType.Kinokino);
         }
-        /*波動拳
+        /*波動拳L
         横を向いている
         *両手を前に突き出している
         *手と手がある程度重なっている*/
         else if (Isside() &&
         Ishandfront() &&
-        Ishandsoverlap())
+        Ishandsoverlap() && Pos[11].x > Pos[15].x)
         {
-            ChangeState(PoseType.Hadouken);
+            ChangeState(PoseType.Hadouken_l);
+        }
+        /*波動拳R
+        横を向いている
+        *両手を前に突き出している
+        *手と手がある程度重なっている*/
+        else if (Isside() &&
+        Ishandfront() &&
+        Ishandsoverlap() && Pos[12].x < Pos[16].x)
+        {
+            ChangeState(PoseType.Hadouken_r);
         }
         /*かめはめ波
         正面を向いている
@@ -192,28 +207,53 @@ public class PoseCheck_rita : MonoBehaviour
                 }
                 break;
             #endregion
-            //hadouken
+            //hadoukenL
             #region
-            case PoseType.Hadouken:
+            case PoseType.Hadouken_l:
                 //一度だけやる処理
                 if (stateEnter)
                 {
                     stateEnter = false;
-                    Debug.Log("pose:hadouken");
-                    hadouken_anime.SetActive(true);
-                    ImageTrack(15, hadouken_rect);
+                    Debug.Log("pose:hadoukenL");
+                    hadoukenL_anime.SetActive(true);
+                    ImageTrack(15, hadoukenL_rect);
 
                 }
                 //ポーズが変わったら
                 if (currentState != newState)
                 {
-                    hadouken_anime.SetActive(false);
+                    hadoukenL_anime.SetActive(false);
                     stateEnter = true;
                 }
                 //ポーズがそのままならポーズの処理
                 else
                 {
-                    hadouken_rect.position += new Vector3(-10, 0, 0);
+                    hadoukenL_rect.position += new Vector3(-10, 0, 0);
+                }
+                break;
+            #endregion
+            //hadoukenR
+            #region
+            case PoseType.Hadouken_r:
+                //一度だけやる処理
+                if (stateEnter)
+                {
+                    stateEnter = false;
+                    Debug.Log("pose:hadoukenR");
+                    hadoukenR_anime.SetActive(true);
+                    ImageTrack(15, hadoukenR_rect);
+
+                }
+                //ポーズが変わったら
+                if (currentState != newState)
+                {
+                    hadoukenR_anime.SetActive(false);
+                    stateEnter = true;
+                }
+                //ポーズがそのままならポーズの処理
+                else
+                {
+                    hadoukenR_rect.position += new Vector3(10, 0, 0);
                 }
                 break;
             #endregion
