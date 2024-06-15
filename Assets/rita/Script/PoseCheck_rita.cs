@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,10 +15,9 @@ public class PoseCheck_rita : MonoBehaviour
         Lisp,
         Kinokino,
         Hadouken,
-        Genbaneko,
         Glico,
-        Jojo,
-        Kamehameha
+        Kamehameha,
+        Stroheim,
     }
 
     bool stateEnter = true;
@@ -27,11 +27,19 @@ public class PoseCheck_rita : MonoBehaviour
     //test用
     [SerializeField] Text checktext;
 
-    //各ポーズエフェクト
+    /*各ポーズエフェクト*/
+    //きのきの
     [SerializeField] GameObject kinokino_img;
     RectTransform kinokino_rect;
+    //Lisp
     [SerializeField] GameObject lisp_img;
     RectTransform lisp_rect;
+    //波動拳
+    [SerializeField] GameObject hadouken_anime;
+    RectTransform hadouken_rect;
+    //グリコ
+    [SerializeField] GameObject glico_img;
+    RectTransform glico_rect;
 
     //座標調整用
     float force = 5;
@@ -42,8 +50,11 @@ public class PoseCheck_rita : MonoBehaviour
         Pos = PoseReceiver.landmarkPosition;
         currentState = PoseType.None;  // 初期ステートを設定
 
+        //エフェクトのRectTransform取得
         kinokino_rect = kinokino_img.GetComponent<RectTransform>();
         lisp_rect=lisp_img.GetComponent<RectTransform>();
+        hadouken_rect=hadouken_anime.GetComponent<RectTransform>();
+        glico_rect=glico_img.GetComponent<RectTransform>();
     }
 
     // Update is called once per frame
@@ -52,22 +63,53 @@ public class PoseCheck_rita : MonoBehaviour
         Pos = PoseReceiver.landmarkPosition;  // 毎フレーム位置を更新
         
         // ここでポーズの位置に応じたステート変更を行う
-        //Lispポーズ
-        if (Math.Abs(Pos[0].y - Pos[13].y) <= 0.1 && Math.Abs(Pos[0].x - Pos[13].x) <= 0.2
-            || Math.Abs(Pos[0].y - Pos[14].y) <= 0.1&& Math.Abs(Pos[0].x - Pos[14].x) <= 0.2)
+
+        /*グリコ
+        //左ひざが上がっている
+        //両手が上がっている*/
+        if (Isupleftknee() &&
+        Israisearm())
         {
-            ChangeState(PoseType.Lisp);
+            ChangeState(PoseType.Glico);
         }
         //きのきの
         else if (Pos[0].y > Pos[19].y && Pos[0].y > Pos[20].y)
         {
             ChangeState(PoseType.Kinokino);
         }
-        //ジョジョ
-        else if (Pos[12].x > Pos[11].x)
+        /*波動拳
+        横を向いている
+        *両手を前に突き出している
+        *手と手がある程度重なっている*/
+        else if (Isside() &&
+        Ishandfront() &&
+        Ishandsoverlap())
         {
-            ChangeState(PoseType.Jojo);
-        }//この下にあたらしいぽーずを追加
+            ChangeState(PoseType.Hadouken);
+        }
+        /*かめはめ波
+        正面を向いている
+        *手と手がある程度重なっている*/
+        else if (Isfront() &&
+        Ishandsoverlap())
+        {
+            ChangeState(PoseType.Kamehameha);
+        }
+        /*シュトロハイム
+        *両肘が鼻より上
+        *手先が鼻より下
+        *左ひざを突き出している
+        */
+        else if (Israisearm())
+        {
+            ChangeState(PoseType.Stroheim);
+        }
+        //Lispポーズ
+        else if (Math.Abs(Pos[0].y - Pos[13].y) <= 0.1 && Math.Abs(Pos[0].x - Pos[13].x) <= 0.2
+            || Math.Abs(Pos[0].y - Pos[14].y) <= 0.1 && Math.Abs(Pos[0].x - Pos[14].x) <= 0.2)
+        {
+            ChangeState(PoseType.Lisp);
+        }
         else
         {
             ChangeState(PoseType.None);
@@ -122,20 +164,7 @@ public class PoseCheck_rita : MonoBehaviour
                 //ポーズがそのままならポーズの処理
                 else
                 {
-                    Vector3 pos = Pos[12];
-                    Debug.Log("元posデータ" + pos);
-                    //posの値の範囲:0~1
-                    pos.x *= Screen.width;
-                    pos.y *= Screen.height;
-                    lisp_rect.position = new Vector2(pos.x, Screen.height - pos.y);
-                    Debug.Log("kinokinoの元scale" + lisp_rect.localScale);
-                    //kinokino_rect.localScale *= (-pos.z);
-
-                    Debug.Log("pos.x" + pos.x);
-                    Debug.Log("pos.y" + pos.y);
-                    Debug.Log("pos.z" + pos.z);
-                    Debug.Log("lispの座標" + pos);
-                    Debug.Log("lispのscale" + kinokino_rect.localScale);
+                    ImageTrack(12, lisp_rect);
                 }
                 break;
             #endregion
@@ -154,30 +183,64 @@ public class PoseCheck_rita : MonoBehaviour
                 if (currentState != newState)
                 {
                     kinokino_img.SetActive(false);
-                    Debug.Log("きのきのじゃなくなった");
                     stateEnter = true;
                 }
                 //ポーズがそのままならポーズの処理
                 else
                 {
-                    Vector3 pos = Pos[0];
-                    Debug.Log("元posデータ"+pos);
-                    //posの値の範囲:0~1
-                    pos.x *= Screen.width;
-                    pos.y *= Screen.height;
-                    kinokino_rect.position = new Vector2(pos.x, Screen.height-pos.y);
-                    Debug.Log("kinokinoの元scale" + kinokino_rect.localScale);
-                    //kinokino_rect.localScale *= (-pos.z);
+                    ImageTrack(0, kinokino_rect);
+                }
+                break;
+            #endregion
+            //hadouken
+            #region
+            case PoseType.Hadouken:
+                //一度だけやる処理
+                if (stateEnter)
+                {
+                    stateEnter = false;
+                    Debug.Log("pose:hadouken");
+                    hadouken_anime.SetActive(true);
+                    ImageTrack(15, hadouken_rect);
 
-                    Debug.Log("pos.x"+pos.x);
-                    Debug.Log("pos.y"+pos.y);
-                    Debug.Log("pos.z" + pos.z);
-                    Debug.Log("kinokinoの座標"+pos);
-                    Debug.Log("kinokinoのscale" + kinokino_rect.localScale);
+                }
+                //ポーズが変わったら
+                if (currentState != newState)
+                {
+                    hadouken_anime.SetActive(false);
+                    stateEnter = true;
+                }
+                //ポーズがそのままならポーズの処理
+                else
+                {
+                    hadouken_rect.position += new Vector3(-10, 0, 0);
+                }
+                break;
+            #endregion
+            //glico
+            #region
+            case PoseType.Glico:
+                //一度だけやる処理
+                if (stateEnter)
+                {
+                    stateEnter = false;
+                    Debug.Log("pose:glico");
+                    glico_img.SetActive(true);
+
+                }
+                //ポーズが変わったら
+                if (currentState != newState)
+                {
+                    glico_img.SetActive(false);
+                    stateEnter = true;
+                }
+                //ポーズがそのままならポーズの処理
+                else
+                {
+                    ImageTrack(0, glico_rect);
                 }
                 break;
                 #endregion
-
         }
 
         //state更新
@@ -194,6 +257,131 @@ public class PoseCheck_rita : MonoBehaviour
             // ステート変更時の処理をここに追加
             checktext.text = NewState.ToString();
         }
+    }
+
+    //画像追尾
+    void ImageTrack(int posNum,RectTransform rect)//参照する座標番号、画像のレクト
+    {
+        Vector3 pos = Pos[posNum];
+        Debug.Log("元posデータ" + pos);
+        //posの値の範囲:0~1
+        pos.x *= Screen.width;
+        pos.y *= Screen.height;
+        rect.position = new Vector2(pos.x, Screen.height - pos.y);
+        Debug.Log("元scale" + rect.localScale);
+        //kinokino_rect.localScale *= (-pos.z);
+
+        Debug.Log("pos.x" + pos.x);
+        Debug.Log("pos.y" + pos.y);
+        Debug.Log("pos.z" + pos.z);
+        Debug.Log("座標" + pos);
+        Debug.Log("scale" + rect.localScale);
+    }
+
+    //ポーズ判定用
+    bool Isside()
+    {
+        if (Math.Abs(Pos[11].x - Pos[12].x) < 0.15)
+        {
+            Debug.Log("横を向いています");
+            return true;
+        }
+        return false;
+    }
+    bool Isfront()
+    {
+        if (Math.Abs(Pos[11].x - Pos[12].x) > 0.15)
+        {
+            Debug.Log("正面を向いています");
+            return true;
+        }
+        return false;
+    }
+    bool Israisearm()
+    {
+        //肘が鼻より高い(y座標は下が正)
+        if (Pos[0].y > Pos[14].y &&
+        Pos[0].y > Pos[13].y)
+        {
+            Debug.Log("両手が上がっています");
+            return true;
+        }
+        return false;
+    }
+    bool Ishandsoverlap()
+    {
+        //両手のxy座標が近い
+        if (Math.Abs(Pos[15].y - Pos[16].y) < 0.1 &&
+        Math.Abs(Pos[15].x - Pos[16].x) < 0.1)
+        {
+            Debug.Log("両手が重なっています");
+            return true;
+        }
+        return false;
+    }
+    bool Isupleftknee()
+    {
+        //左ひざが右ひざより上
+        if (Pos[25].y < Pos[26].y)
+        {
+
+            Debug.Log("左ひざが上がっています");
+            return true;
+        }
+        return false;
+    }
+    bool IsUpRightKnee()
+    {
+        //右ひざが左ひざより上
+        if (Pos[25].y > Pos[26].y)
+        {
+            Debug.Log("右ひざが上がっています");
+            return true;
+        }
+        return false;
+    }
+    bool Ishandfront()
+    {
+        if (Math.Abs(Pos[12].y - Pos[16].y) < 0.2 &&
+        Math.Abs(Pos[11].y - Pos[15].y) < 0.2)
+        {
+            Debug.Log("両手をまっすぐ突き出しています");
+            return true;
+        }
+        return false;
+    }
+    bool IsLeftElbowBent()
+    {
+        float thresholdAngle = 160f;
+
+        Vector3 upperArm = Pos[13] - Pos[11];
+        Vector3 forearm = Pos[15] - Pos[13];
+
+        float angle = Vector3.Angle(upperArm, forearm);
+
+        if (angle < thresholdAngle)
+        {
+            //Debug.Log("左ひじが曲がっています");
+            return true;
+        }
+        return angle < thresholdAngle;
+    }
+    bool IsRightElbowBent()
+    {
+        float thresholdAngle = 160f;
+
+        Vector3 upperArm = Pos[14] - Pos[12];
+        Vector3 forearm = Pos[16] - Pos[14];
+        Debug.Log("upperArm:" + upperArm);
+        Debug.Log("forear:" + forearm);
+
+        float angle = Vector3.Angle(upperArm, forearm);
+        if (angle < thresholdAngle)
+        {
+            //Debug.Log("みぎひじが曲げまげ");
+            return true;
+        }
+        return angle < thresholdAngle;
     }
 
 }
