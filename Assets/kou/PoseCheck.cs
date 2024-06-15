@@ -20,8 +20,9 @@ public class PoseCheck : MonoBehaviour
         Stroheim,   //7
         KujoJotaro, //8
         Giornogiovana, //9
-        HighwayStar,    //10
-        Bondold     //11
+        HighwayStar,//10
+        DIO,        //11
+        Killerqueen //12
 
     }
 
@@ -72,8 +73,8 @@ public class PoseCheck : MonoBehaviour
         *左ひざを突き出している
         */
         if (Israisearm()&&
-        IsHandBelowNose()&&
-        Isupleftknee())
+        //IsHandBelowNose()&&
+        IsUpRightKnee())
         {
             ChangeState(PoseType.Stroheim);
         }
@@ -133,6 +134,28 @@ public class PoseCheck : MonoBehaviour
         {
             ChangeState(PoseType.Giornogiovana);
         }
+        //Lispポーズ
+        else if (Isnear(0,13,0.1) || Isnear(1,14,0.1))
+        {
+            ChangeState(PoseType.Lisp);
+        }
+        /*DIO
+        * 横一文字
+        * 16<14<12<11<13<15.x
+        * 保留
+        */
+        else if(false)
+        {
+            ChangeState(PoseType.DIO);
+        }
+        /*キラークイーン
+        * 腕組んでる
+        * 正面向いている
+        */
+        else if(Isudekumi()&& Isfront())
+        {
+            ChangeState(PoseType.Killerqueen);
+        }
         /*空条承太郎＆スタープラチナ
         *--横向いている--
         *手を前に突き出している
@@ -143,19 +166,6 @@ public class PoseCheck : MonoBehaviour
         IsUpSomeHand()&&
         (Isnear(20,24,0.3) || Isnear(21,23,0.3))){
             ChangeState(PoseType.KujoJotaro);
-        }
-        //Lispポーズ
-        else if (Isnear(0,13,0.1) || Isnear(1,14,0.1))
-        {
-            ChangeState(PoseType.Lisp);
-        }
-        /*ボンボルド
-        *
-        *
-        */
-        else if(false)
-        {
-            ChangeState(PoseType.Bondold);
         }
         else
         {
@@ -226,8 +236,8 @@ public class PoseCheck : MonoBehaviour
     bool Ishandsoverlap()
     {
         //両手のxy座標が近い
-        if(Math.Abs(Pos[15].y - Pos[16].y) < 0.1 &&
-        Math.Abs(Pos[15].x - Pos[16].x) < 0.1)
+        if(Math.Abs(Pos[15].y - Pos[16].y) < 0.05 &&
+        Math.Abs(Pos[15].x - Pos[16].x) < 0.05)
         {
             Debug.Log("両手が重なっています");
             return true;
@@ -237,7 +247,8 @@ public class PoseCheck : MonoBehaviour
     bool Isupleftknee()
     {
         //左ひざが右ひざより上
-        if(Pos[25].y < Pos[26].y)
+        //要修正（ある程度離れたら）
+        if((Pos[26].y-Pos[25].y) > 0.05)
         {
             
             Debug.Log("左ひざが上がっています");
@@ -248,7 +259,7 @@ public class PoseCheck : MonoBehaviour
     bool IsUpRightKnee()
     {
         //右ひざが左ひざより上
-        if(Pos[25].y > Pos[26].y)
+        if((Pos[25].y - Pos[26].y) > 0.05)
         {
             Debug.Log("右ひざが上がっています");
             return true;
@@ -363,6 +374,17 @@ public class PoseCheck : MonoBehaviour
         Math.Abs(Pos[12].y - Pos[24].y) < 0.2)
         {
             Debug.Log("前かがみです");
+            return true;
+        }
+        return false;
+    }
+    bool Isudekumi()
+    {
+        //右手と左ひじ
+        //左手と右ひじ
+        if(Isnear(14,15,0.1)&& Isnear(13,16,0.1))
+        {
+            Debug.Log("腕を組んでいます");
             return true;
         }
         return false;
