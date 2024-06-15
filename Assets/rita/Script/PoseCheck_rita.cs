@@ -50,6 +50,12 @@ public class PoseCheck_rita : MonoBehaviour
     //グリコ
     [SerializeField] GameObject glico_img;
     RectTransform glico_rect;
+    //ハイウェイスター
+    [SerializeField] GameObject highwaystar_img;
+    RectTransform highwaystar_rect;
+    //スタープラチナ
+    [SerializeField] GameObject starplatinum_img;
+    RectTransform starplatinum_rect;
 
     //座標調整用
     float force = 5;
@@ -68,6 +74,8 @@ public class PoseCheck_rita : MonoBehaviour
         hadoukenL_rect=hadoukenL_anime.GetComponent<RectTransform>();
         hadoukenR_rect = hadoukenR_anime.GetComponent<RectTransform>();
         glico_rect =glico_img.GetComponent<RectTransform>();
+        highwaystar_rect=highwaystar_img.GetComponent<RectTransform>();
+        starplatinum_rect=starplatinum_img.GetComponent<RectTransform>();
     }
 
     // Update is called once per frame
@@ -325,8 +333,53 @@ public class PoseCheck_rita : MonoBehaviour
                     ImageTrack(0, glico_rect);
                 }
                 break;
+            #endregion
+            //HighwayStar
+            #region
+            case PoseType.HighwayStar:
+                //一度だけやる処理
+                if (stateEnter)
+                {
+                    highwaystar_img.SetActive(true);
+                    stateEnter = false;
+                }
+                //ポーズが変わったら
+                if (currentState != newState)
+                {
+                    stateEnter = true;
+                    highwaystar_img.SetActive(false);
+                }
+                //ポーズがそのままならポーズの処理
+                else
+                {
+                    ImageTrack(24, highwaystar_rect);
+                }
+                break;
+            #endregion
+            //KujoJotaro
+            #region
+            case PoseType.KujoJotaro:
+                //一度だけやる処理
+                if (stateEnter)
+                {
+                    starplatinum_img.SetActive(true);
+                    stateEnter = false;
+                }
+                //ポーズが変わったら
+                if (currentState != newState)
+                {
+                    stateEnter = true;
+                    starplatinum_img.SetActive(false);
+                }
+                //ポーズがそのままならポーズの処理
+                else
+                {
+                    ImageTrack(0, starplatinum_rect);
+                }
+                break;
                 #endregion
         }
+
 
         //state更新
         currentState = newState;
