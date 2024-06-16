@@ -1302,7 +1302,7 @@ MonoBehaviour:
   poseImage: {fileID: 733806143}
   poseSprites:
   - {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  - {fileID: 21300000, guid: c7eb0a7e878918c4697ecaa83d425d3f, type: 3}
+  - {fileID: 21300000, guid: 2d6d53d9467cfac41b3db3e8eac2d181, type: 3}
   - {fileID: 21300000, guid: 553df98151fc16b48922601e8a1e9d25, type: 3}
   - {fileID: 21300000, guid: 725fc4a101103b840a8e8033de2ff279, type: 3}
   - {fileID: 21300000, guid: ff26429eff6b5e0458398580fa640c5c, type: 3}
@@ -1312,7 +1312,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: a931a7afb84719d438ff983dd2ce2c69, type: 3}
   - {fileID: 21300000, guid: 0e1892d74943eaa48a8fcf56ed33b1b6, type: 3}
   - {fileID: 21300000, guid: 294217ea2440b82498c36d534924cc69, type: 3}
-  - {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 21300000, guid: 9aec67050ba8baa4488879d194c0ead6, type: 3}
   - {fileID: 21300000, guid: 01b358498926ab440b7fc56cb67b1116, type: 3}
   checktext: {fileID: 1010328132}
 --- !u!4 &1962176516
