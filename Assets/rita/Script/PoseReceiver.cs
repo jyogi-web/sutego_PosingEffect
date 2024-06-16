@@ -85,6 +85,11 @@ public class PoseReceiver : MonoBehaviour
                 }
             }
             Debug.Log("Received data: " + jsonData);
+/*            Debug.Log(landmarkPosition.Length);
+            for (int i = 0; i < landmarkPosition.Length; i++)
+            {
+                Debug.Log("currentpos at index " + i + ": " + landmarkPosition[i]);
+            }*/
         }
         catch (JsonException e)
         {

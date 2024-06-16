@@ -11,17 +11,21 @@ public class PoseCheck_rita : MonoBehaviour
     Vector3[] Pos;
     public enum PoseType
     {
-        None,
-        Lisp,
-        Kinokino,
+        KujoJotaro,
+        Stroheim,
+        HighwayStar,
+        Kamehameha,
         Hadouken_l,
         Hadouken_r,
         Glico,
-        Kamehameha,
-        Stroheim,
-        KujoJotaro,
+        Lisp,
+        None,
+
+
+
+        Kinokino,
         Giornogiovana,
-        HighwayStar
+       
     }
 
     bool stateEnter = true;
@@ -73,6 +77,9 @@ public class PoseCheck_rita : MonoBehaviour
     Vector3[] ps_hadoukenL;
     Vector3[] ps_kamehameha;
     Vector3[] ps_lisp;
+
+    //類似度（デバッグ用）
+    float[] pos_cos;
 
     //座標調整用
     float force = 5;
@@ -177,26 +184,83 @@ public class PoseCheck_rita : MonoBehaviour
 
         // ここでポーズの位置に応じたステート変更を行う
 
-            /*シュトロハイム
-            *両肘が鼻より上
-            *手先が鼻より下
-            *左ひざを突き出している
-            */
-        if (ManualCos(currentpos, ps_stroheim) > 0.9)
+        /*        Debug.Log("currentpos.Length:"+currentpos.Length);
+                for (int i = 0; i < currentpos.Length; i++)
+                {
+                    Debug.Log("currentpos at index " + i + ": " + currentpos[i]);
+                }
+
+                Debug.Log("starplatinum.length:" + ps_starplatinum.Length);
+                Debug.Log(ps_starplatinum);
+                for (int i = 0; i < ps_starplatinum.Length; i++)
+                {
+                    Debug.Log("ps_starplatinum at index " + i + ": " + ps_starplatinum[i]);
+                }*/
+        //類似度を格納
+        /* try
+         {
+             Debug.Log("類似度を格納");
+             pos_cos[0] = ManualCos(currentpos, ps_starplatinum);
+             pos_cos[1] = ManualCos(currentpos, ps_stroheim);
+             pos_cos[2] = ManualCos(currentpos, ps_highwaystar);
+             pos_cos[3] = ManualCos(currentpos, ps_kamehameha);
+             pos_cos[4] = ManualCos(currentpos, ps_hadoukenL);
+             pos_cos[5] = ManualCos(currentpos, ps_hadoukenR);
+             pos_cos[6] = ManualCos(currentpos, ps_glico);
+             pos_cos[7] = ManualCos(currentpos, ps_lisp);
+
+             int Maxpose = -1;
+             float Maxcos = 0;
+             //一番類似度の高いものを探す
+             for (int i = 0; i < pos_cos.Length; i++)
+             {
+                 if (pos_cos[i] > Maxcos)
+                 {
+                     Maxcos = pos_cos[i];
+                     Maxpose = i;
+                 }
+             }
+             //基準値を超えていれば判定
+             if (pos_cos[Maxpose] > 0.93)
+             {
+                 Debug.Log("cos類似度" + pos_cos[Maxpose]);
+                 ChangeState((PoseType)Maxpose);
+
+             }
+             else
+             {
+                 ChangeState(PoseType.None);
+             }
+         }
+         catch
+         {
+             Debug.Log("類似度比較失敗:リトライします");
+         }
+         */
+
+        #region
+        //シュトロハイム
+        // 両肘が鼻より上
+        //手先が鼻より下
+        // 左ひざを突き出している
+
+
+        if (ManualCos(currentpos, ps_stroheim) > 0.85)
         {
             Debug.Log("シュトロハイムcos類似度：" + ManualCos(currentpos, ps_stroheim));
             ChangeState(PoseType.Stroheim);
         }
-        /*        else if (Israisearm() &&
-                IsHandBelowNose() &&
-                Isupleftknee())
-                {
-                    ChangeState(PoseType.Stroheim);
-                }*/
-        /*グリコ
+        /*else if (Israisearm() &&
+        IsHandBelowNose() &&
+        Isupleftknee())
+        {
+            ChangeState(PoseType.Stroheim);
+        }*/
+        //グリコ
         //左ひざが上がっている
-        //両手が上がっている*/
-        else if (ManualCos(currentpos, ps_glico) > 0.9)
+        //両手が上がっている
+        else if (ManualCos(currentpos, ps_glico) > 0.9&& Isupleftknee() &&
+        Israisearm())
         {
             ChangeState(PoseType.Glico);
         }
@@ -205,44 +269,44 @@ public class PoseCheck_rita : MonoBehaviour
         {
             ChangeState(PoseType.Glico);
         }*/
-        //きのきの
-        else if (Pos[0].y > Pos[19].y && Pos[0].y > Pos[20].y)
-        {
-            ChangeState(PoseType.Kinokino);
-        }
-        /*波動拳L
-        横を向いている
-        *両手を前に突き出している
-        *手と手がある程度重なっている*/
-        else if (ManualCos(currentpos, ps_hadoukenL) > 0.93)
-        {
-            ChangeState(PoseType.Hadouken_l);
-        }
-        /*else if (Isside() &&
+        //波動拳L
+        //横を向いている
+        // 両手を前に突き出している
+        //手と手がある程度重なっている
+       /* else if (ManualCos(currentpos, ps_hadoukenL) > 0.9&& Isside() &&
         Ishandfront() &&
         Ishandsoverlap() && Pos[11].x > Pos[15].x)
         {
             ChangeState(PoseType.Hadouken_l);
         }*/
-        /*波動拳R
-        横を向いている
-        *両手を前に突き出している
-        *手と手がある程度重なっている*/
-        else if(ManualCos(currentpos,ps_hadoukenR)>0.93)
+        else if (Isside() &&
+        Ishandfront() &&
+        Ishandsoverlap() && Pos[11].x > Pos[15].x&&ManualCos(currentpos, ps_hadoukenL) > 0.85)
         {
-            ChangeState(PoseType.Hadouken_r);
+            ChangeState(PoseType.Hadouken_l);
         }
-        /*else if (Isside() &&
+        //波動拳R
+        //横を向いている
+        //両手を前に突き出している
+        //手と手がある程度重なっている
+       /* else if (ManualCos(currentpos, ps_hadoukenR) > 0.9&& Isside() &&
         Ishandfront() &&
         Ishandsoverlap() && Pos[12].x < Pos[16].x)
         {
             ChangeState(PoseType.Hadouken_r);
         }*/
-        /*ハイウェイスター
-        *肩とひざの判定が近い
-        *手がくっついている
-        */
-        else if(ManualCos(currentpos,ps_highwaystar)>0.96)
+        else if (Isside() &&
+        Ishandfront() &&
+        Ishandsoverlap() && Pos[12].x < Pos[16].x&& ManualCos(currentpos, ps_hadoukenR) > 0.85)
+        {
+            ChangeState(PoseType.Hadouken_r);
+        }
+        //ハイウェイスター
+        //肩とひざの判定が近い
+        //手がくっついている
+
+
+        else if (ManualCos(currentpos, ps_highwaystar) > 0.93)
         {
             ChangeState(PoseType.HighwayStar);
         }
@@ -253,39 +317,42 @@ public class PoseCheck_rita : MonoBehaviour
         {
             ChangeState(PoseType.HighwayStar);
         }*/
-        /*かめはめ波
-        正面を向いている
-        *手と手がある程度重なっている*/
-        else if(ManualCos(currentpos,ps_kamehameha)>0.93)
-        {
-            ChangeState(PoseType.Kamehameha);
-        }
-/*        else if (Isfront() &&
-        Ishandsoverlap())
+        //かめはめ波
+        //正面を向いている
+        //手と手がある程度重なっている
+       /* else if (ManualCos(currentpos, ps_kamehameha) > 0.9&&Isfront())
         {
             ChangeState(PoseType.Kamehameha);
         }*/
-        /*空条承太郎＆スタープラチナ
-        *横向いている
-        *手を前に突き出している
-        * どちらかの手を腰に当てている
-        */
-        else if(ManualCos(currentpos,ps_starplatinum)>0.9)
+        else if (Isfront() &&
+        Ishandsoverlap())
         {
-            Debug.Log("空条承太郎cos類似度：" + ManualCos(currentpos, ps_starplatinum));
+            ChangeState(PoseType.Kamehameha);
+        }
+        //空条承太郎＆スタープラチナ
+        //横向いている
+        //手を前に突き出している
+        //どちらかの手を腰に当てている
+
+
+        else if (ManualCos(currentpos, ps_starplatinum) > 0.95 &&
+        (Isnear(20, 24, 0.3) ||
+        Isnear(21, 23, 0.3)))
+        {
             ChangeState(PoseType.KujoJotaro);
         }
-       /* else if (Isside() &&
+        /*else if (Isside() &&
         IsUpSomeHand() &&
         (Isnear(20, 24, 0.3) ||
         Isnear(21, 23, 0.3)))
         {
             ChangeState(PoseType.KujoJotaro);
         }*/
-        /*ゴールドエクスペリエンス
-        *肩の中心と右手が近い
-        *左手は腰
-        */
+        //ゴールドエクスペリエンス
+        //肩の中心と右手が近い
+        //左手は腰
+
+
         else if (IsHandCenter() &&
         Isnear(15, 23, 0.3)
         )
@@ -293,7 +360,7 @@ public class PoseCheck_rita : MonoBehaviour
             ChangeState(PoseType.Giornogiovana);
         }
         //Lispポーズ
-        else if(ManualCos(currentpos,ps_lisp)>0.93)
+        else if (ManualCos(currentpos, ps_lisp) > 0.9)
         {
             ChangeState(PoseType.Lisp);
         }
@@ -302,6 +369,11 @@ public class PoseCheck_rita : MonoBehaviour
         {
             ChangeState(PoseType.Lisp);
         }*/
+        //きのきの
+        else if (Pos[0].y > Pos[19].y && Pos[0].y > Pos[20].y)
+        {
+            ChangeState(PoseType.Kinokino);
+        }
         else
         {
             ChangeState(PoseType.None);
@@ -312,6 +384,8 @@ public class PoseCheck_rita : MonoBehaviour
         // {
         //     ChangeState(PoseType.別のポーズ);
         // }
+
+        #endregion
 
         //ステートによってswitch文で処理
         switch (currentState)
