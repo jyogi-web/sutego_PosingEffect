@@ -32,7 +32,7 @@ mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 
 # カメラのキャプチャ
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 # TCP/IPソケットを作成し、サーバーに接続
 print("画像データ用TCP/IPソケットを作成しています")

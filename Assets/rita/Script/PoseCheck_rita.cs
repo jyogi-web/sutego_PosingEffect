@@ -57,9 +57,74 @@ public class PoseCheck_rita : MonoBehaviour
     //スタープラチナ
     [SerializeField] GameObject starplatinum_img;
     RectTransform starplatinum_rect;
+    //かめはめ派
+    [SerializeField] GameObject kamehame_fx;
+    RectTransform kamehame_rect;
+    ParticleSystem kamehame_par;
+
+    //ポーズサンプル
+    PoseSample posesample;
+    Vector3[] currentpos;
+    Vector3[] ps_starplatinum;//スタープラチナム
+    Vector3[] ps_stroheim;//シュトロハイム
+    Vector3[] ps_highwaystar;
+    Vector3[] ps_glico;
+    Vector3[] ps_hadoukenR;
+    Vector3[] ps_hadoukenL;
+    Vector3[] ps_kamehameha;
+    Vector3[] ps_lisp;
 
     //座標調整用
     float force = 5;
+
+    // 絶対座標のVector3配列から相対座標のVector3配列に変換
+    public static Vector3[] ConvertToRelativeCoordinates(Vector3[] absoluteCoordinates, int referenceIndex)
+    {
+        if (referenceIndex < 0 || referenceIndex >= absoluteCoordinates.Length)
+        {
+            Debug.LogError("参照インデックスが配列の範囲外です。");
+            return null;
+        }
+
+        Vector3 referencePoint = absoluteCoordinates[referenceIndex]; // 参照点
+        Vector3[] relativeCoordinates = new Vector3[absoluteCoordinates.Length];
+
+        for (int i = 0; i < absoluteCoordinates.Length; i++)
+        {
+            // 相対座標の計算
+            relativeCoordinates[i] = absoluteCoordinates[i] - referencePoint;
+        }
+
+        return relativeCoordinates;
+    }
+
+    //cos類似度
+    public static float ManualCos(Vector3[] A, Vector3[] B)
+    {
+        if (A.Length != B.Length)
+        {
+            Debug.LogError("配列の長さが異なります。");
+            return 0f;
+        }
+
+        float dotSum = 0f;
+        float aNormSum = 0f;
+        float bNormSum = 0f;
+
+        for (int i = 0; i < A.Length; i++)
+        {
+            dotSum += Vector3.Dot(A[i], B[i]);
+            aNormSum += A[i].sqrMagnitude;
+            bNormSum += B[i].sqrMagnitude;
+        }
+
+        float cos = dotSum / (Mathf.Sqrt(aNormSum) * Mathf.Sqrt(bNormSum) + 1e-10f);
+
+        // 検出できない場合の処理
+        cos = (cos == 0) ? float.NaN : cos;
+
+        return cos;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -67,7 +132,7 @@ public class PoseCheck_rita : MonoBehaviour
         Pos = PoseReceiver.landmarkPosition;
         currentState = PoseType.None;  // 初期ステートを設定
 
-        audiosource = GetComponent<AudioSource>();
+            audiosource = GetComponent<AudioSource>();
 
         //エフェクトのRectTransform取得
         kinokino_rect = kinokino_img.GetComponent<RectTransform>();
@@ -77,23 +142,69 @@ public class PoseCheck_rita : MonoBehaviour
         glico_rect =glico_img.GetComponent<RectTransform>();
         highwaystar_rect=highwaystar_img.GetComponent<RectTransform>();
         starplatinum_rect=starplatinum_img.GetComponent<RectTransform>();
+        kamehame_rect=kamehame_fx.GetComponent<RectTransform>();
+        //Particle取得
+        kamehame_par = kamehame_fx.GetComponent<ParticleSystem>();
+
+        //ポーズサンプル
+        posesample=GetComponent<PoseSample>();
+
+        ps_starplatinum = posesample.starplatinum_sample;//スタープラチナ
+        ps_starplatinum = ConvertToRelativeCoordinates(ps_starplatinum, 12);
+        ps_stroheim = posesample.stroheim_sample;//シュトロハイム
+        ps_stroheim=ConvertToRelativeCoordinates(ps_stroheim, 12);
+        ps_highwaystar=posesample.highwaystar_sample;//ハイウェイスター
+        ps_highwaystar=ConvertToRelativeCoordinates(ps_highwaystar, 12);
+        ps_kamehameha = posesample.kamehameha_sample;//かめはめ波
+        ps_kamehameha=ConvertToRelativeCoordinates(ps_kamehameha, 12);
+        ps_hadoukenL = posesample.hadoukenL_sample;//波動拳左
+        ps_hadoukenL = ConvertToRelativeCoordinates(ps_hadoukenL, 12);
+        ps_hadoukenR =posesample.hadoukenR_sample;//波動拳右
+        ps_hadoukenR=ConvertToRelativeCoordinates(ps_hadoukenR, 12);
+        ps_glico=posesample.glico_sample;//グリコ
+        ps_glico=ConvertToRelativeCoordinates(ps_glico, 12);
+        ps_lisp=posesample.lisp_sample;//リスプ
+        ps_lisp=ConvertToRelativeCoordinates(ps_lisp, 12);
+        
     }
 
     // Update is called once per frame
     void Update()
     {
         Pos = PoseReceiver.landmarkPosition;  // 毎フレーム位置を更新
-        
+        currentpos = ConvertToRelativeCoordinates(Pos, 12);
+;
+
         // ここでポーズの位置に応じたステート変更を行う
 
+            /*シュトロハイム
+            *両肘が鼻より上
+            *手先が鼻より下
+            *左ひざを突き出している
+            */
+        if (ManualCos(currentpos, ps_stroheim) > 0.9)
+        {
+            Debug.Log("シュトロハイムcos類似度：" + ManualCos(currentpos, ps_stroheim));
+            ChangeState(PoseType.Stroheim);
+        }
+        /*        else if (Israisearm() &&
+                IsHandBelowNose() &&
+                Isupleftknee())
+                {
+                    ChangeState(PoseType.Stroheim);
+                }*/
         /*グリコ
         //左ひざが上がっている
         //両手が上がっている*/
-        if (Isupleftknee() &&
-        Israisearm())
+        else if (ManualCos(currentpos, ps_glico) > 0.9)
         {
             ChangeState(PoseType.Glico);
         }
+        /*else if (Isupleftknee() &&
+        Israisearm())
+        {
+            ChangeState(PoseType.Glico);
+        }*/
         //きのきの
         else if (Pos[0].y > Pos[19].y && Pos[0].y > Pos[20].y)
         {
@@ -103,64 +214,74 @@ public class PoseCheck_rita : MonoBehaviour
         横を向いている
         *両手を前に突き出している
         *手と手がある程度重なっている*/
-        else if (Isside() &&
+        else if (ManualCos(currentpos, ps_hadoukenL) > 0.93)
+        {
+            ChangeState(PoseType.Hadouken_l);
+        }
+        /*else if (Isside() &&
         Ishandfront() &&
         Ishandsoverlap() && Pos[11].x > Pos[15].x)
         {
             ChangeState(PoseType.Hadouken_l);
-        }
+        }*/
         /*波動拳R
         横を向いている
         *両手を前に突き出している
         *手と手がある程度重なっている*/
-        else if (Isside() &&
+        else if(ManualCos(currentpos,ps_hadoukenR)>0.93)
+        {
+            ChangeState(PoseType.Hadouken_r);
+        }
+        /*else if (Isside() &&
         Ishandfront() &&
         Ishandsoverlap() && Pos[12].x < Pos[16].x)
         {
             ChangeState(PoseType.Hadouken_r);
-        }
+        }*/
         /*ハイウェイスター
         *肩とひざの判定が近い
         *手がくっついている
         */
-        else if (
+        else if(ManualCos(currentpos,ps_highwaystar)>0.96)
+        {
+            ChangeState(PoseType.HighwayStar);
+        }
+        /*else if (
             Ishandsoverlap() &&
             Ismaekagami()
         )
         {
             ChangeState(PoseType.HighwayStar);
-        }
+        }*/
         /*かめはめ波
         正面を向いている
         *手と手がある程度重なっている*/
-        else if (Isfront() &&
-        Ishandsoverlap())
+        else if(ManualCos(currentpos,ps_kamehameha)>0.93)
         {
             ChangeState(PoseType.Kamehameha);
         }
-        /*シュトロハイム
-        *両肘が鼻より上
-        *手先が鼻より下
-        *左ひざを突き出している
-        */
-        else if (Israisearm() &&
-        IsHandBelowNose() &&
-        Isupleftknee())
+/*        else if (Isfront() &&
+        Ishandsoverlap())
         {
-            ChangeState(PoseType.Stroheim);
-        }
+            ChangeState(PoseType.Kamehameha);
+        }*/
         /*空条承太郎＆スタープラチナ
         *横向いている
         *手を前に突き出している
         * どちらかの手を腰に当てている
         */
-        else if (Isside() &&
+        else if(ManualCos(currentpos,ps_starplatinum)>0.9)
+        {
+            Debug.Log("空条承太郎cos類似度：" + ManualCos(currentpos, ps_starplatinum));
+            ChangeState(PoseType.KujoJotaro);
+        }
+       /* else if (Isside() &&
         IsUpSomeHand() &&
         (Isnear(20, 24, 0.3) ||
         Isnear(21, 23, 0.3)))
         {
             ChangeState(PoseType.KujoJotaro);
-        }
+        }*/
         /*ゴールドエクスペリエンス
         *肩の中心と右手が近い
         *左手は腰
@@ -172,11 +293,15 @@ public class PoseCheck_rita : MonoBehaviour
             ChangeState(PoseType.Giornogiovana);
         }
         //Lispポーズ
-        else if (Math.Abs(Pos[0].y - Pos[13].y) <= 0.1 && Math.Abs(Pos[0].x - Pos[13].x) <= 0.2
-            || Math.Abs(Pos[0].y - Pos[14].y) <= 0.1 && Math.Abs(Pos[0].x - Pos[14].x) <= 0.2)
+        else if(ManualCos(currentpos,ps_lisp)>0.93)
         {
             ChangeState(PoseType.Lisp);
         }
+        /*else if (Math.Abs(Pos[0].y - Pos[13].y) <= 0.1 && Math.Abs(Pos[0].x - Pos[13].x) <= 0.2
+            || Math.Abs(Pos[0].y - Pos[14].y) <= 0.1 && Math.Abs(Pos[0].x - Pos[14].x) <= 0.2)
+        {
+            ChangeState(PoseType.Lisp);
+        }*/
         else
         {
             ChangeState(PoseType.None);
@@ -271,7 +396,6 @@ public class PoseCheck_rita : MonoBehaviour
                     hadoukenL_anime.SetActive(true);
                     ImageTrack(15, hadoukenL_rect);
                     audiosource.PlayOneShot(hadouken_se);
-
                 }
                 //ポーズが変わったら
                 if (currentState != newState)
@@ -379,6 +503,39 @@ public class PoseCheck_rita : MonoBehaviour
                     ImageTrack(0, starplatinum_rect);
                 }
                 break;
+            #endregion
+            //Kamehameha
+            #region
+            case PoseType.Kamehameha:
+                //一度だけやる処理
+                if (stateEnter)
+                {
+                    kamehame_fx.SetActive(true);
+                    kamehame_par.Play();
+                    stateEnter = false;
+                    GameObject.Find("Canvas").GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceCamera;
+                }
+                //ポーズが変わったら
+                if (currentState != newState)
+                {
+                    stateEnter = true;
+                    kamehame_fx.SetActive(false);
+                    GameObject.Find("Canvas").GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
+                }
+                //ポーズがそのままならポーズの処理
+                else
+                {
+                    Vector3 pos = Pos[15];
+                    Debug.Log("元posデータ" + pos);
+                    //posの値の範囲:0~1
+                    pos.x *= Screen.width;
+                    pos.y *= Screen.height;
+                    pos.x -= 960;
+                    pos.y += 520;
+                    kamehame_rect.transform.localPosition = new Vector3(pos.x, Screen.height - pos.y, 0);
+                    Debug.Log("元scale" + kamehame_rect.transform.localPosition);
+                }
+                break;
                 #endregion
         }
 
@@ -407,15 +564,9 @@ public class PoseCheck_rita : MonoBehaviour
         //posの値の範囲:0~1
         pos.x *= Screen.width;
         pos.y *= Screen.height;
-        rect.position = new Vector2(pos.x, Screen.height - pos.y);
+        rect.position = new Vector3(pos.x, Screen.height - pos.y,0);
         Debug.Log("元scale" + rect.localScale);
         //kinokino_rect.localScale *= (-pos.z);
-
-        Debug.Log("pos.x" + pos.x);
-        Debug.Log("pos.y" + pos.y);
-        Debug.Log("pos.z" + pos.z);
-        Debug.Log("座標" + pos);
-        Debug.Log("scale" + rect.localScale);
     }
 
     //ポーズ判定用
