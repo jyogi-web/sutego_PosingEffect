@@ -305,8 +305,9 @@ public class PoseCheck_rita : MonoBehaviour
         //肩とひざの判定が近い
         //手がくっついている
 
-
-        else if (ManualCos(currentpos, ps_highwaystar) > 0.93)
+        //ManualCos(currentpos, ps_highwaystar) > 0.93)
+        else if (Ishandsoverlap() &&
+            Ismaekagami())
         {
             ChangeState(PoseType.HighwayStar);
         }
@@ -335,7 +336,8 @@ public class PoseCheck_rita : MonoBehaviour
         //どちらかの手を腰に当てている
 
 
-        else if (ManualCos(currentpos, ps_starplatinum) > 0.95 &&
+        else if (IsUpSomeHand() && 
+            ManualCos(currentpos, ps_starplatinum) > 0.95 &&
         (Isnear(20, 24, 0.3) ||
         Isnear(21, 23, 0.3)))
         {
@@ -370,7 +372,7 @@ public class PoseCheck_rita : MonoBehaviour
             ChangeState(PoseType.Lisp);
         }*/
         //きのきの
-        else if (Pos[0].y > Pos[19].y && Pos[0].y > Pos[20].y)
+        else if (Pos[0].y > Pos[21].y && Pos[0].y > Pos[22].y&&IsElbowBelowNose())
         {
             ChangeState(PoseType.Kinokino);
         }
@@ -646,7 +648,7 @@ public class PoseCheck_rita : MonoBehaviour
     //ポーズ判定用
     bool Isside()
     {
-        if (Math.Abs(Pos[11].x - Pos[12].x) < 0.15)
+        if (Math.Abs(Pos[11].x - Pos[12].x) < 0.1)
         {
             Debug.Log("横を向いています");
             return true;
@@ -655,7 +657,7 @@ public class PoseCheck_rita : MonoBehaviour
     }
     bool Isfront()
     {
-        if (Math.Abs(Pos[11].x - Pos[12].x) > 0.15)
+        if (Math.Abs(Pos[11].x - Pos[12].x) > 0.1)
         {
             Debug.Log("正面を向いています");
             return true;
@@ -676,8 +678,8 @@ public class PoseCheck_rita : MonoBehaviour
     bool Ishandsoverlap()
     {
         //両手のxy座標が近い
-        if (Math.Abs(Pos[15].y - Pos[16].y) < 0.1 &&
-        Math.Abs(Pos[15].x - Pos[16].x) < 0.1)
+        if (Math.Abs(Pos[15].y - Pos[16].y) < 0.08 &&
+        Math.Abs(Pos[15].x - Pos[16].x) < 0.08)
         {
             Debug.Log("両手が重なっています");
             return true;
@@ -687,7 +689,8 @@ public class PoseCheck_rita : MonoBehaviour
     bool Isupleftknee()
     {
         //左ひざが右ひざより上
-        if (Pos[25].y < Pos[26].y)
+        //要修正（ある程度離れたら）
+        if ((Pos[26].y - Pos[25].y) > 0.05)
         {
 
             Debug.Log("左ひざが上がっています");
@@ -698,7 +701,7 @@ public class PoseCheck_rita : MonoBehaviour
     bool IsUpRightKnee()
     {
         //右ひざが左ひざより上
-        if (Pos[25].y > Pos[26].y)
+        if ((Pos[25].y - Pos[26].y) > 0.05)
         {
             Debug.Log("右ひざが上がっています");
             return true;
@@ -748,6 +751,7 @@ public class PoseCheck_rita : MonoBehaviour
         }
         return angle < thresholdAngle;
     }
+
     bool IsUpSomeHand()
     {
         if (Math.Abs(Pos[0].y - Pos[16].y) < 0.2 ||
@@ -760,15 +764,16 @@ public class PoseCheck_rita : MonoBehaviour
     }
     bool IsHandCenter()
     {
-        float thresholdDistance = 0.2f;
+        float thresholdDistance = 0.15f;
         // 左肩と右肩の中間点を計算
         float shoulderCenter = (Pos[11].x + Pos[12].x) / 2;
+        //Debug.Log("中心点：" + shoulderCenter);
 
         // 距離がしきい値以下かどうかを判定
-        if (shoulderCenter < thresholdDistance)
+        if (Math.Abs(shoulderCenter - Pos[20].x) < thresholdDistance)
         {
 
-            Debug.Log("手が胸の中心にあります:" + shoulderCenter);
+            Debug.Log("手が胸の中心にあります:" + Pos[20].x);
             return true;
         }
         return false;
@@ -784,22 +789,62 @@ public class PoseCheck_rita : MonoBehaviour
         }
         return false;
     }
+    bool IsElbowBelowNose()
+    {
+        Debug.Log("Pos[0]:" + Pos[0].y + "Pos[14]:" + Pos[14].y + "Pos[13]:" + Pos[13].y);
+        if (Pos[0].y < Pos[14].y)
+        {
+            Debug.Log("右ひじが鼻より下です");
+        }
+        if (Pos[0].y < Pos[13].y)
+        {
+            Debug.Log("左ひじが鼻より下です");
+        }
+        //判定悪
+        if (Pos[0].y < Pos[14].y &&
+        Pos[0].y < Pos[13].y)
+        {
+            Debug.Log("肘が鼻より下です");
+            return true;
+        }
+        return false;
+    }
     bool Ismaekagami()
     {
         //肩と腰が近い
-        if (Math.Abs(Pos[11].y - Pos[23].y) < 0.2 ||
-        Math.Abs(Pos[12].y - Pos[24].y) < 0.2)
+        if (Math.Abs(Pos[11].y - Pos[23].y) < 0.25 ||
+        Math.Abs(Pos[12].y - Pos[24].y) < 0.25)
         {
             Debug.Log("前かがみです");
             return true;
         }
         return false;
     }
+    bool Isudekumi()
+    {
+        //右手と左ひじ
+        //左手と右ひじ
+        if (Isnear(14, 15, 0.1) && Isnear(13, 16, 0.1))
+        {
+            Debug.Log("腕を組んでいます");
+            return true;
+        }
+        return false;
+    }
     bool Isnear(int a, int b, double sikii)
     {
-        if ((Math.Abs(Pos[a].y - Pos[b].y) <= sikii && Math.Abs(Pos[a].x - Pos[b].x) <= sikii))
+        if (Math.Abs(Pos[a].y - Pos[b].y) <= sikii && Math.Abs(Pos[a].x - Pos[b].x) <= sikii)
         {
             Debug.Log(a + "と" + b + "が近づきました");
+            return true;
+        }
+        return false;
+    }
+    bool Isfar(int a, int b, double sikii)
+    {
+        if (Math.Abs(Pos[a].y - Pos[b].y) >= sikii && Math.Abs(Pos[a].x - Pos[b].x) >= sikii)
+        {
+            Debug.Log(a + "と" + b + "は遠いです");
             return true;
         }
         return false;
